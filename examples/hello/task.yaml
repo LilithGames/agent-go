@@ -1,0 +1,14 @@
+plans:
+
+  - treeName: hello
+    robotNum: 1
+    parallel: 100
+    interval: 1
+
+  - treeName: hellox
+    robotNum: 2
+    parallel: 100
+    interval: 1
+
+metadata:
+  org: lilithgame

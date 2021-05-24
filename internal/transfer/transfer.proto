@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+option go_package = "./;transfer";
+
+enum ACTION {
+  START_AGENT = 0;
+  STOP_AGENT = 1;
+  REPORT_DATA = 2;
+  FINISH_PLAN = 3;
+}
+
+message Mail {
+  ACTION action = 1;
+  bytes content = 2;
+}
+
+message Plan {
+  string treeName = 1;
+  int32 robotNum = 2;
+  int32 parallel = 3;
+  int32 interval = 4;
+}
+
+message Event {
+  string image = 1;
+  int32 agentNum = 2;
+  bytes rawTree = 3;
+  bytes rawConf = 4;
+}
+
+message EventReply {
+  string eventID = 1;
+  string status = 2;
+  repeated PlanReply replies = 3;
+}
+
+message Quantity {
+  string Name = 1;
+  int64 totalNum = 2;
+  int64 errorNum = 3;
+  int64 maxTime = 4;
+  int64 minTime = 5;
+  int64 avgTime = 6;
+  map<string, int64> errorMap = 7;
+}
+
+message PlanReply {
+  string name = 1;
+  int64 beginTime = 2;
+  int64 endTime = 3;
+  repeated Quantity quantities = 4;
+}
+
+enum STATUS {
+  WAITING = 0;
+  SUCCESS = 1;
+  FAILURE = 2;
+  RUNNING = 3;
+  ERROR   = 4;
+}
+
+message Outcome {
+  string name = 1;
+  STATUS status = 2;
+  int64 consume = 3;
+  string err = 4;
+}
+
+message Report {
+  string planID = 1;
+  repeated Outcome outcomes = 2;
+}
+
+service Courier {
+  rpc DeliverMail(stream Mail) returns (stream Mail) {};
+}

@@ -1,0 +1,233 @@
+{
+  "name": "hello",
+  "description": "",
+  "data": {
+    "version": "0.3.0",
+    "scope": "project",
+    "selectedTree": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
+    "trees": [
+      {
+        "version": "0.3.0",
+        "scope": "tree",
+        "id": "e933515f-3b2e-470f-9c6b-da54c2ca18c9",
+        "title": "hello",
+        "description": "",
+        "root": "cde32224-53ee-404a-86e5-fd7b666b4725",
+        "properties": {},
+        "nodes": {
+          "cde32224-53ee-404a-86e5-fd7b666b4725": {
+            "id": "cde32224-53ee-404a-86e5-fd7b666b4725",
+            "name": "Sequence",
+            "category": "composite",
+            "title": "Sequence",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -84,
+              "y": -12
+            },
+            "children": [
+              "9f710fb3-592c-4dc0-8502-87c78757d6be",
+              "de23fbf6-9fba-4837-8327-ffb32863b5df",
+              "51b58802-4a6c-442b-9223-e325cabeb996",
+              "355d98a1-f472-404b-80db-9fd698abd725",
+              "22ed45d4-167c-4fda-8d76-27900665d6c4"
+            ]
+          },
+          "9f710fb3-592c-4dc0-8502-87c78757d6be": {
+            "id": "9f710fb3-592c-4dc0-8502-87c78757d6be",
+            "name": "helloA",
+            "category": "action",
+            "title": "helloA",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 120,
+              "y": -192
+            }
+          },
+          "de23fbf6-9fba-4837-8327-ffb32863b5df": {
+            "id": "de23fbf6-9fba-4837-8327-ffb32863b5df",
+            "name": "helloB",
+            "category": "action",
+            "title": "helloB",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 120,
+              "y": -96
+            }
+          },
+          "51b58802-4a6c-442b-9223-e325cabeb996": {
+            "id": "51b58802-4a6c-442b-9223-e325cabeb996",
+            "name": "helloC",
+            "category": "action",
+            "title": "helloC",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 120,
+              "y": 0
+            }
+          },
+          "355d98a1-f472-404b-80db-9fd698abd725": {
+            "id": "355d98a1-f472-404b-80db-9fd698abd725",
+            "name": "helloD",
+            "category": "action",
+            "title": "helloD",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 120,
+              "y": 108
+            }
+          },
+          "22ed45d4-167c-4fda-8d76-27900665d6c4": {
+            "id": "22ed45d4-167c-4fda-8d76-27900665d6c4",
+            "name": "helloE",
+            "category": "action",
+            "title": "helloE",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 132,
+              "y": 192
+            }
+          }
+        },
+        "display": {
+          "camera_x": 960,
+          "camera_y": 508.5,
+          "camera_z": 1,
+          "x": -192,
+          "y": -12
+        }
+      },
+      {
+        "version": "0.3.0",
+        "scope": "tree",
+        "id": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
+        "title": "hellox",
+        "description": "",
+        "root": "4624bd47-4cdd-4d95-8cbe-bf3217308b7f",
+        "properties": {},
+        "nodes": {
+          "87d3e037-156b-475e-b935-287a732981ae": {
+            "id": "87d3e037-156b-475e-b935-287a732981ae",
+            "name": "helloA",
+            "category": "action",
+            "title": "helloA",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 204,
+              "y": -108
+            }
+          },
+          "ec58b1b2-fd58-4064-8382-96ddda694b45": {
+            "id": "ec58b1b2-fd58-4064-8382-96ddda694b45",
+            "name": "helloC",
+            "category": "action",
+            "title": "helloC",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 204,
+              "y": 24
+            }
+          },
+          "3752a7e4-8211-4d53-8a4e-51721b9af7cb": {
+            "id": "3752a7e4-8211-4d53-8a4e-51721b9af7cb",
+            "name": "helloE",
+            "category": "action",
+            "title": "helloE",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 204,
+              "y": 168
+            }
+          },
+          "4624bd47-4cdd-4d95-8cbe-bf3217308b7f": {
+            "id": "4624bd47-4cdd-4d95-8cbe-bf3217308b7f",
+            "name": "Sequence",
+            "category": "composite",
+            "title": "Sequence",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -24,
+              "y": 24
+            },
+            "children": [
+              "87d3e037-156b-475e-b935-287a732981ae",
+              "ec58b1b2-fd58-4064-8382-96ddda694b45",
+              "3752a7e4-8211-4d53-8a4e-51721b9af7cb"
+            ]
+          }
+        },
+        "display": {
+          "camera_x": 960,
+          "camera_y": 508.5,
+          "camera_z": 1,
+          "x": -120,
+          "y": 24
+        }
+      }
+    ],
+    "custom_nodes": [
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "helloA",
+        "category": "action",
+        "title": "helloA",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "helloB",
+        "category": "action",
+        "title": "helloB",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "helloC",
+        "category": "action",
+        "title": "helloC",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "helloD",
+        "category": "action",
+        "title": "helloD",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "helloE",
+        "category": "action",
+        "title": "helloE",
+        "description": null,
+        "properties": {},
+        "parent": null
+      }
+    ],
+    "custom_folders": []
+  },
+  "path": "D:\\hello.b3"
+}
