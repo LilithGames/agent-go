@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/AsynkronIT/protoactor-go/actor"
-	"github.com/LilithGames/agent-go/internal/transfer"
+	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/magicsea/behavior3go/loader"
 	"go.uber.org/zap"

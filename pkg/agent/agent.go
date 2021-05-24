@@ -2,7 +2,7 @@ package agent
 
 import (
 	"context"
-	"github.com/LilithGames/agent-go/internal/transfer"
+	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/rs/xid"
 	"go.uber.org/zap"

@@ -3,7 +3,7 @@ package agent
 import (
 	"bytes"
 	"fmt"
-	"github.com/LilithGames/agent-go/internal/transfer"
+	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/olekukonko/tablewriter"
 	"sort"
 	"strconv"

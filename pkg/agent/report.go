@@ -2,7 +2,7 @@ package agent
 
 import (
 	"github.com/AsynkronIT/protoactor-go/actor"
-	"github.com/LilithGames/agent-go/internal/transfer"
+	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
 	"go.uber.org/zap"
 )

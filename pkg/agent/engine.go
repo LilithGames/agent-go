@@ -3,7 +3,7 @@ package agent
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/LilithGames/agent-go/internal/transfer"
+	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/ghodss/yaml"
 	"github.com/magicsea/behavior3go"

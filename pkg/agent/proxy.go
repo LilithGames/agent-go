@@ -3,7 +3,7 @@ package agent
 import (
 	"context"
 	"fmt"
-	"github.com/LilithGames/agent-go/internal/transfer"
+	"github.com/LilithGames/agent-go/pkg/transfer"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 	"os"
