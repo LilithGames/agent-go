@@ -8,6 +8,7 @@ import (
 	"github.com/magicsea/behavior3go"
 	"github.com/magicsea/behavior3go/config"
 	"github.com/magicsea/behavior3go/core"
+	"go.uber.org/zap"
 	"math/rand"
 	"time"
 )
@@ -68,6 +69,6 @@ func (n *Action) currentStatus(ctx context.Context, status behavior3go.Status) b
 
 func (n *Action) recoverPanic() {
 	if r := recover(); r != nil {
-		log.Error("recover panic error")
+		log.Error("recover panic error", zap.Any("recover", r))
 	}
 }

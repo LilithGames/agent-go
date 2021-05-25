@@ -71,6 +71,7 @@ func (r *robot) execute(ctx actor.Context, task *job) {
 	outcome := transfer.Outcome{Name: "whole_process"}
 	board := core.NewBlackboard()
 	board.SetMem("actorCtx", ctx)
+	board.SetMem("metadata", task.metadata)
 	var status behavior3go.Status
 	for {
 		status := task.tree.Tick(task, board)

@@ -1,0 +1,5 @@
+remote:
+  addr: "http://127.0.0.1:8081/graphql"
+agent:
+  count: 10
+  image: "agent/hello:latest"
