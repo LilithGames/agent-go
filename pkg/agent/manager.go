@@ -67,13 +67,13 @@ func (m *manager) startAgentEngine(content []byte) error {
 		return err
 	}
 	if len(conf.Trees) != 0 {
-		m.engine.setBehaviorTrees(conf.Trees)
+		m.engine.setTrees(conf.Trees)
 	}
 	if conf.Plans != nil {
-		m.engine.setExecPlans(conf.Plans)
+		m.engine.setPlans(conf.Plans)
 	}
 	if len(conf.Metadata) != 0 {
-		m.engine.metadata = conf.Metadata
+		m.engine.setMetadata(conf.Metadata)
 	}
 	m.startReadyService()
 	return nil

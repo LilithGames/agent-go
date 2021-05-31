@@ -53,47 +53,65 @@ type executor struct {
 	metadata map[string]string
 }
 
-type Engine struct {
-	plans       []*transfer.Plan
-	metadata    map[string]string
+type Behavior struct {
 	handlers    Handlers
 	trees       map[string]*config.BTTreeCfg
 	registerMap *behavior3go.RegisterStructMaps
 }
 
-func NewEngine() *Engine {
-	return &Engine{
-		trees:       map[string]*config.BTTreeCfg{},
-		handlers:    map[string]Handler{},
+func NewBehavior() *Behavior {
+	return &Behavior{
+		handlers: map[string]Handler{},
 		registerMap: behavior3go.NewRegisterStructMaps(),
 	}
 }
 
-func (e *Engine) RegisterHandler(name string, handler Handler) {
-	e.handlers[name] = handler
-	e.registerMap.Register(name, new(Action))
+func (b *Behavior) RegisterHandler(name string, handler Handler) {
+	b.handlers[name] = handler
+	b.registerMap.Register(name, new(Action))
 }
 
-func (e *Engine) RegisterHandlers(handlers Handlers) {
-	for name, handler := range handlers {
-		e.RegisterHandler(name, handler)
-	}
+func (b *Behavior) RegisterNode(name string, node interface{}) {
+	b.registerMap.Register(name, node)
 }
 
-func (e *Engine) RegisterNode(name string, node interface{}) {
-	e.registerMap.Register(name, node)
-}
-
-func (e *Engine) SetTreesFromConfig(conf []byte) {
+func (b *Behavior) RegisterTreeConfig(conf []byte) {
 	var rawCfg config.RawProjectCfg
 	err := json.Unmarshal(conf, &rawCfg)
 	if err != nil {
 		log.Panic("unmarshal behavior tree: ", zap.Error(err))
 	}
-	e.setBehaviorTrees(rawCfg.Data.Trees)
+	for _, tree := range rawCfg.Data.Trees {
+		var cfg = tree
+		loader.CreateBevTreeFromConfig(&cfg, b.registerMap)
+		b.trees[cfg.Title] = &cfg
+	}
 }
 
-func (e *Engine) setBehaviorTrees(trees []config.BTTreeCfg) {
+func (b *Behavior) BuildEngineFromConfig(conf []byte) *Engine {
+	var cfg Config
+	err := yaml.Unmarshal(conf, &cfg)
+	if err != nil {
+		log.Panic("unmarshal plan config", zap.Error(err))
+	}
+	engine := &Engine{Behavior: b}
+	engine.metadata = cfg.Metadata
+	for _, plan := range cfg.Plans {
+		if _, ok := b.trees[plan.TreeName]; !ok {
+			log.Panic("plan name not found")
+		}
+	}
+	engine.plans = cfg.Plans
+	return engine
+}
+
+type Engine struct {
+	*Behavior
+	plans       []*transfer.Plan
+	metadata    map[string]string
+}
+
+func (e *Engine) setTrees(trees []config.BTTreeCfg) {
 	for _, tree := range trees {
 		var treeCfg = tree
 		loader.CreateBevTreeFromConfig(&treeCfg, e.registerMap)
@@ -101,21 +119,15 @@ func (e *Engine) setBehaviorTrees(trees []config.BTTreeCfg) {
 	}
 }
 
-func (e *Engine) BuildEngineFromConfig(conf []byte) {
-	var c Config
-	err := yaml.Unmarshal(conf, &c)
-	if err != nil {
-		log.Panic("unmarshal plan config", zap.Error(err))
-	}
-	e.setExecPlans(c.Plans)
-	e.metadata = c.Metadata
-}
-
-func (e *Engine) setExecPlans(plans []*transfer.Plan) {
+func (e *Engine) setPlans(plans []*transfer.Plan) {
 	for _, plan := range plans {
 		if _, ok := e.trees[plan.TreeName]; !ok {
 			log.Panic("not found name in executors")
 		}
 	}
 	e.plans = plans
+}
+
+func (e *Engine) setMetadata(metadata map[string]string) {
+	e.metadata = metadata
 }
