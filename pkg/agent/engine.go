@@ -71,6 +71,12 @@ func (b *Behavior) RegisterHandler(name string, handler Handler) {
 	b.registerMap.Register(name, new(Action))
 }
 
+func (b *Behavior) RegisterHandlers(handlers Handlers) {
+	for name, handler := range handlers {
+		b.RegisterHandler(name, handler)
+	}
+}
+
 func (b *Behavior) RegisterNode(name string, node interface{}) {
 	b.registerMap.Register(name, node)
 }
