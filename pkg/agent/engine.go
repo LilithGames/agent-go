@@ -62,6 +62,7 @@ type Behavior struct {
 func NewBehavior() *Behavior {
 	return &Behavior{
 		handlers: map[string]Handler{},
+		trees: map[string]*config.BTTreeCfg{},
 		registerMap: behavior3go.NewRegisterStructMaps(),
 	}
 }
