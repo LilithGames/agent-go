@@ -24,8 +24,7 @@ message Plan {
 message Event {
   string image = 1;
   int32 agentNum = 2;
-  bytes rawTree = 3;
-  bytes rawConf = 4;
+  bytes rawCfg = 3;
 }
 
 message EventReply {
