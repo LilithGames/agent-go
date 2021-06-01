@@ -66,9 +66,6 @@ func (m *manager) startAgentEngine(content []byte) error {
 	if err != nil {
 		return err
 	}
-	if len(conf.Trees) != 0 {
-		m.engine.setTrees(conf.Trees)
-	}
 	if conf.Plans != nil {
 		m.engine.setPlans(conf.Plans)
 	}

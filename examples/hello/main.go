@@ -12,10 +12,10 @@ var task []byte
 var helloB3 []byte
 
 func main() {
-	engine := agent.NewEngine()
-	engine.RegisterHandlers(HelloHandlers())
-	engine.SetTreesFromConfig(helloB3)
-	engine.BuildEngineFromConfig(task)
+	behavior := agent.NewBehavior()
+	behavior.RegisterHandlers(HelloHandlers())
+	behavior.RegisterTreeConfig(helloB3)
+	engine := behavior.BuildEngineFromConfig(task)
 	a := agent.NewAgent(engine)
 	a.Start()
 }

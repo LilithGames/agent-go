@@ -15,7 +15,6 @@ import (
 
 type Config struct {
 	Plans    []*transfer.Plan
-	Trees    []config.BTTreeCfg
 	Metadata map[string]string
 }
 
@@ -27,18 +26,10 @@ func (c *Config) UnmarshalBinary(data []byte) error {
 	return json.Unmarshal(data, c)
 }
 
-func (c *Config) UnmarshalRawConfig(rawTree, rawOtherCfg []byte) error {
+func (c *Config) UnmarshalRawConfig(rawCfg []byte) error {
 	var err error
-	if len(rawTree) != 0 {
-		var projectCfg config.RawProjectCfg
-		err = json.Unmarshal(rawTree, &projectCfg)
-		if err != nil {
-			return fmt.Errorf("unmarshal tree config err: %w", err)
-		}
-		c.Trees = projectCfg.Data.Trees
-	}
-	if len(rawOtherCfg) != 0 {
-		err = yaml.Unmarshal(rawOtherCfg, c)
+	if len(rawCfg) != 0 {
+		err = yaml.Unmarshal(rawCfg, c)
 		if err != nil {
 			return fmt.Errorf("unmarshal task config: %w", err)
 		}
