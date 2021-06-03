@@ -24,7 +24,7 @@ message Plan {
 message Event {
   string image = 1;
   int32 agentNum = 2;
-  bytes rawCfg = 3;
+  map<string, string> environments = 3;
 }
 
 message EventReply {

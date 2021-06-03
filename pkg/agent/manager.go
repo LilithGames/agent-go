@@ -61,16 +61,13 @@ func (m *manager) reviewMail(mail *transfer.Mail) error {
 }
 
 func (m *manager) startAgentEngine(content []byte) error {
-	var conf Config
-	err := json.Unmarshal(content, &conf)
+	var envs map[string]string
+	err := json.Unmarshal(content, &envs)
 	if err != nil {
 		return err
 	}
-	if conf.Plans != nil {
-		m.engine.setPlans(conf.Plans)
-	}
-	if len(conf.Metadata) != 0 {
-		m.engine.setMetadata(conf.Metadata)
+	if len(envs) != 0 {
+		m.engine.setMetadata(envs)
 	}
 	m.startReadyService()
 	return nil

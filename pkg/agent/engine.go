@@ -15,7 +15,7 @@ import (
 
 type Config struct {
 	Plans    []*transfer.Plan
-	Metadata map[string]string
+	Environments map[string]string
 }
 
 func (c *Config) MarshalBinary() (data []byte, err error) {
@@ -93,7 +93,7 @@ func (b *Behavior) BuildEngineFromConfig(conf []byte) *Engine {
 		log.Panic("unmarshal plan config", zap.Error(err))
 	}
 	engine := &Engine{Behavior: b}
-	engine.metadata = cfg.Metadata
+	engine.metadata = cfg.Environments
 	for _, plan := range cfg.Plans {
 		if _, ok := b.trees[plan.TreeName]; !ok {
 			log.Panic("plan name not found")
@@ -126,6 +126,12 @@ func (e *Engine) setPlans(plans []*transfer.Plan) {
 	e.plans = plans
 }
 
-func (e *Engine) setMetadata(metadata map[string]string) {
-	e.metadata = metadata
+func (e *Engine) setMetadata(envs map[string]string) {
+	if len(e.metadata) == 0 {
+		e.metadata = envs
+		return
+	}
+	for name, value := range envs {
+		e.metadata[name] = value
+	}
 }
