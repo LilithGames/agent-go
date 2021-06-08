@@ -51,7 +51,7 @@ func (n *Action) OnTick(tick *core.Tick) behavior3go.Status {
 		outcome.Consume = time.Since(begin.(time.Time)).Nanoseconds()
 	}
 	if begin == nil && status == behavior3go.RUNNING {
-		tick.Blackboard.SetMem(n.name, start)
+		tick.Blackboard.SetMem(beginKey, start)
 	}
 	actorCtx := tick.Blackboard.GetMem("actorCtx").(actor.Context)
 	actorCtx.Send(job.statPID, &outcome)
