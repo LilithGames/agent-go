@@ -103,6 +103,13 @@ func (b *Behavior) BuildEngineFromConfig(conf []byte) *Engine {
 	return engine
 }
 
+func (b *Behavior) BuildTestEngine(envs map[string]string, plan *transfer.Plan) *Engine {
+	engine := &Engine{Behavior: b}
+	engine.metadata = envs
+	engine.plans = append(engine.plans, plan)
+	return engine
+}
+
 type Engine struct {
 	*Behavior
 	plans       []*transfer.Plan

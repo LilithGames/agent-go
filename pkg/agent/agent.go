@@ -11,16 +11,26 @@ import (
 	"os"
 )
 
+const masterAddr = "MASTER_ADDR"
+
 type Agent struct {
 	engine   *Engine
 	endpoint string
+}
+
+func IsTestMode() bool {
+	endpoint := os.Getenv(masterAddr)
+	if endpoint == "" {
+		return true
+	}
+	return false
 }
 
 func NewAgent(engine *Engine) *Agent {
 	if len(engine.plans) == 0 {
 		log.Panic("absent plans")
 	}
-	endpoint := os.Getenv("MASTER_ADDR")
+	endpoint := os.Getenv(masterAddr)
 	return &Agent{engine: engine, endpoint: endpoint}
 }
 
