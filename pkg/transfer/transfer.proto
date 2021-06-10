@@ -34,13 +34,17 @@ message EventReply {
 }
 
 message Quantity {
-  string Name = 1;
+  string name = 1;
   int64 totalNum = 2;
   int64 errorNum = 3;
   int64 maxTime = 4;
   int64 minTime = 5;
   int64 avgTime = 6;
   map<string, int64> errorMap = 7;
+}
+
+message Quantities {
+  map<string, Quantity> value = 1;
 }
 
 message PlanReply {
