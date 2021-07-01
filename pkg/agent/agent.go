@@ -2,13 +2,14 @@ package agent
 
 import (
 	"context"
+	"os"
+
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/rs/xid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"os"
 )
 
 const masterAddr = "MASTER_ADDR"
@@ -16,6 +17,7 @@ const masterAddr = "MASTER_ADDR"
 type Agent struct {
 	engine   *Engine
 	endpoint string
+	opt      *AgentOpt
 }
 
 func IsTestMode() bool {
@@ -26,12 +28,12 @@ func IsTestMode() bool {
 	return false
 }
 
-func NewAgent(engine *Engine) *Agent {
+func NewAgent(engine *Engine, opts ...*AgentOpt) *Agent {
 	if len(engine.plans) == 0 {
 		log.Panic("absent plans")
 	}
 	endpoint := os.Getenv(masterAddr)
-	return &Agent{engine: engine, endpoint: endpoint}
+	return &Agent{engine: engine, endpoint: endpoint, opt: mergeAgentOpt(opts...)}
 }
 
 func (a *Agent) Start() {
@@ -43,7 +45,7 @@ func (a *Agent) Start() {
 }
 
 func (a *Agent) startDefaultAgent() {
-	c := newProxyStream(nil)
+	c := newProxyStream(nil, a.opt.getView())
 	newManager(a.engine, c).startReadyService()
 	<-c.ctx.Done()
 }
@@ -56,7 +58,7 @@ func (a *Agent) startClusterAgent() {
 	if err != nil {
 		log.Panic("request grpc courier error", zap.Error(err))
 	}
-	var c = newProxyStream(client)
+	var c = newProxyStream(client, a.opt.getView())
 	newManager(a.engine, c).startService()
 	<-c.ctx.Done()
 }
