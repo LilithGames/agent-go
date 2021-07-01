@@ -3,12 +3,13 @@ package agent
 import (
 	"bytes"
 	"fmt"
-	"github.com/LilithGames/agent-go/pkg/transfer"
-	"github.com/olekukonko/tablewriter"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/LilithGames/agent-go/pkg/transfer"
+	"github.com/olekukonko/tablewriter"
 )
 
 func newQuantity(name string) *transfer.Quantity {
@@ -19,13 +20,15 @@ func newQuantity(name string) *transfer.Quantity {
 }
 
 type quantities struct {
-	Value map[string]*transfer.Quantity `json:"value"`
+	Name      string
+	Value     map[string]*transfer.Quantity `json:"value"`
 	ErrResult map[string]int
 }
 
-func newQuantities() *quantities {
+func newQuantities(name string) *quantities {
 	return &quantities{
-		Value: map[string]*transfer.Quantity{},
+		Name:      name,
+		Value:     map[string]*transfer.Quantity{},
 		ErrResult: map[string]int{},
 	}
 }
@@ -37,22 +40,23 @@ func computeAverage(val1, num1, val2, num2 int64) int64 {
 	return part1 + part2
 }
 
-func printQuantities(quantities *quantities) {
-	quantitySlice := make([]*transfer.Quantity, 0)
-	for _, quantity := range quantities.Value {
-		quantitySlice = append(quantitySlice, quantity)
-	}
-	if len(quantitySlice) > 1 {
-		printQuantitySlice(quantitySlice)
-	}
-	if len(quantities.ErrResult) > 0 {
-		printErrorMessage(quantities.ErrResult)
-	}
+func (q *quantities) print(opts ...*ViewOpt) {
+	q.printQuantitySlice(opts...)
+	q.printErrorMessage(opts...)
 }
 
-func printQuantitySlice(quantities []*transfer.Quantity) {
+func (q *quantities) printQuantitySlice(opts ...*ViewOpt) {
+	quantities := make([]*transfer.Quantity, 0)
+	for _, quantity := range q.Value {
+		quantities = append(quantities, quantity)
+	}
+	if len(quantities) <= 1 {
+		return
+	}
+	opt := mergeViewOpt(opts...)
 	buf := bytes.NewBuffer(nil)
 	table := tablewriter.NewWriter(buf)
+	opt.apply(table)
 	header := []string{"Name", "Total", "Fail", "Min", "Average", "Max"}
 	table.SetHeader(header)
 	names := make([]string, 0)
@@ -80,7 +84,7 @@ func printQuantitySlice(quantities []*transfer.Quantity) {
 		table.Append(row)
 	}
 	table.Render()
-	title := "Plan Statistic"
+	title := fmt.Sprintf("Plan Statistic(%s): ", q.Name)
 	fmt.Printf("\r\n%s\r\n%s", title, buf.String())
 }
 
@@ -100,19 +104,24 @@ func toTimeStr(val int64) string {
 	return dur.Round(time.Millisecond).String()
 }
 
-func printErrorMessage(errs map[string]int)  {
+func (q *quantities) printErrorMessage(opts ...*ViewOpt) {
+	if len(q.ErrResult) <= 0 {
+		return
+	}
+	opt := mergeViewOpt(opts...)
 	buf := bytes.NewBuffer(nil)
 	table := tablewriter.NewWriter(buf)
+	opt.apply(table)
 	header := []string{"Reason", "Count"}
 	table.SetHeader(header)
-	for err, count := range errs {
+	for err, count := range q.ErrResult {
 		row := make([]string, len(header))
 		row[0] = err
 		row[1] = strconv.Itoa(count)
 		table.Append(row)
 	}
 	table.Render()
-	title := "Task Error: "
+	title := fmt.Sprintf("Task Error(%s): ", q.Name)
 	fmt.Printf("\r\n%s\r\n%s", title, buf.String())
 }
 

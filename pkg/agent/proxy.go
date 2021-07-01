@@ -3,10 +3,11 @@ package agent
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
-	"os"
 )
 
 type proxyStream struct {
@@ -18,10 +19,11 @@ type proxyStream struct {
 	ctx        context.Context
 	cancel     context.CancelFunc
 	client     transfer.Courier_DeliverMailClient
+	viewOpt    *ViewOpt
 }
 
-func newProxyStream(client transfer.Courier_DeliverMailClient) *proxyStream {
-	proxy := &proxyStream{client: client, id: os.Getenv("ID")}
+func newProxyStream(client transfer.Courier_DeliverMailClient, viewOpts ...*ViewOpt) *proxyStream {
+	proxy := &proxyStream{client: client, id: os.Getenv("ID"), viewOpt: mergeViewOpt(viewOpts...)}
 	proxy.ctx, proxy.cancel = context.WithCancel(context.Background())
 	return proxy
 }
@@ -39,7 +41,7 @@ func (s *proxyStream) sendFinish(planName string) error {
 		s.index++
 	}()
 	if s.client == nil {
-		return s.echoLocalData()
+		return s.echoLocalData(planName)
 	}
 	planID := s.formatPlanID(planName)
 	mail := &transfer.Mail{Action: transfer.ACTION_FINISH_PLAN, Content: []byte(planID)}
@@ -58,7 +60,7 @@ func (s *proxyStream) sendFinish(planName string) error {
 
 func (s *proxyStream) sendReport(planName string, report *transfer.Report) error {
 	if s.client == nil {
-		return s.pushLocalData(report)
+		return s.pushLocalData(planName, report)
 	}
 	report.PlanID = s.formatPlanID(planName)
 	content, err := proto.Marshal(report)
@@ -80,17 +82,17 @@ func (s *proxyStream) Recv() (*transfer.Mail, error) {
 	return nil, nil
 }
 
-func (s *proxyStream) pushLocalData(report *transfer.Report) error {
+func (s *proxyStream) pushLocalData(planName string, report *transfer.Report) error {
 	if s.quantities == nil {
-		s.quantities = newQuantities()
+		s.quantities = newQuantities(planName)
 	}
 	putReportData(s.quantities, report.Outcomes)
 	return nil
 }
 
-func (s *proxyStream) echoLocalData() error {
-	printQuantities(s.quantities)
-	s.quantities = newQuantities()
+func (s *proxyStream) echoLocalData(planName string) error {
+	s.quantities.print(s.viewOpt)
+	s.quantities = newQuantities(planName)
 	return nil
 }
 
