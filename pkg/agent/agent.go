@@ -22,10 +22,7 @@ type Agent struct {
 
 func IsTestMode() bool {
 	endpoint := os.Getenv(masterAddr)
-	if endpoint == "" {
-		return true
-	}
-	return false
+	return endpoint == ""
 }
 
 func NewAgent(engine *Engine, opts ...*AgentOpt) *Agent {

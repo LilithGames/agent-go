@@ -22,14 +22,14 @@ func newQuantity(name string) *transfer.Quantity {
 type quantities struct {
 	Name      string
 	Value     map[string]*transfer.Quantity `json:"value"`
-	ErrResult map[string]int
+	ErrResult map[string]map[string]int
 }
 
 func newQuantities(name string) *quantities {
 	return &quantities{
 		Name:      name,
 		Value:     map[string]*transfer.Quantity{},
-		ErrResult: map[string]int{},
+		ErrResult: map[string]map[string]int{},
 	}
 }
 
@@ -83,6 +83,7 @@ func (q *quantities) printQuantitySlice(opts ...*ViewOpt) {
 		row := createQuantityRow(stat)
 		table.Append(row)
 	}
+	table.SetRowLine(true)
 	table.Render()
 	title := fmt.Sprintf("Plan Statistic(%s): ", q.Name)
 	fmt.Printf("\r\n%s\r\n%s", title, buf.String())
@@ -105,21 +106,25 @@ func toTimeStr(val int64) string {
 }
 
 func (q *quantities) printErrorMessage(opts ...*ViewOpt) {
-	if len(q.ErrResult) <= 0 {
+	if len(q.ErrResult) == 0 {
 		return
 	}
 	opt := mergeViewOpt(opts...)
 	buf := bytes.NewBuffer(nil)
 	table := tablewriter.NewWriter(buf)
 	opt.apply(table)
-	header := []string{"Reason", "Count"}
+	header := []string{"Name", "Reason", "Count"}
 	table.SetHeader(header)
-	for err, count := range q.ErrResult {
-		row := make([]string, len(header))
-		row[0] = err
-		row[1] = strconv.Itoa(count)
-		table.Append(row)
+	for name, es := range q.ErrResult {
+		for err, count := range es {
+			row := make([]string, len(header))
+			row[0] = name
+			row[1] = err
+			row[2] = strconv.Itoa(count)
+			table.Append(row)
+		}
 	}
+	table.SetRowLine(true)
 	table.Render()
 	title := fmt.Sprintf("Task Error(%s): ", q.Name)
 	fmt.Printf("\r\n%s\r\n%s", title, buf.String())
@@ -144,11 +149,12 @@ func putReportData(quantities *quantities, outcomes []*transfer.Outcome) {
 			q.ErrorNum++
 		}
 		if outcome.Err != "" {
-			v, ok := quantities.ErrResult[outcome.Err]
+			es, ok := quantities.ErrResult[outcome.Name]
 			if !ok {
-				quantities.ErrResult[outcome.Err] = 1
+				es = make(map[string]int)
+				quantities.ErrResult[outcome.Name] = es
 			}
-			quantities.ErrResult[outcome.Err] = v + 1
+			es[outcome.Err]++
 		}
 	}
 }
