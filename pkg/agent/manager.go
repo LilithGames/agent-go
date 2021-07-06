@@ -75,6 +75,7 @@ func (m *manager) startAgentEngine(content []byte) error {
 
 func (m *manager) startReadyService() {
 	m.stream.setPlanCount(len(m.engine.plans))
+	var executors []*executor
 	for _, plan := range m.engine.plans {
 		treeCfg := m.engine.trees[plan.TreeName]
 		tree := loader.CreateBevTreeFromConfig(treeCfg, m.engine.registerMap)
@@ -84,6 +85,7 @@ func (m *manager) startReadyService() {
 			tree:     tree,
 			metadata: m.engine.metadata,
 		}
+		executors = append(executors, executor)
 		m.startExecutor(executor)
 	}
 }

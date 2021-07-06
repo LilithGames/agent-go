@@ -7,6 +7,7 @@ enum ACTION {
   STOP_AGENT = 1;
   REPORT_DATA = 2;
   FINISH_PLAN = 3;
+  START_CIRCLE = 4;
 }
 
 message Mail {
