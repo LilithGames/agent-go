@@ -30,7 +30,7 @@ func newProxyStream(client transfer.Courier_DeliverMailClient, viewOpts ...*View
 }
 
 func (s *proxyStream) setPlanCount(count int, circle bool) {
-	s.index = 1
+	s.index = 0
 	s.count = count
 	s.circle = circle
 }
@@ -54,7 +54,7 @@ func (s *proxyStream) sendFinish(planName string) error {
 	if err != nil {
 		return fmt.Errorf("send finish message: %w", err)
 	}
-	if s.index >= s.count && !s.circle {
+	if s.index >= s.count - 1 && !s.circle {
 		err = s.client.CloseSend()
 		if err != nil {
 			return fmt.Errorf("send close message: %w", err)
