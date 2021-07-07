@@ -14,6 +14,7 @@ type proxyStream struct {
 	grpc.ClientStream
 	index      int
 	count      int
+	circle     bool
 	id         string
 	quantities *quantities
 	ctx        context.Context
@@ -28,9 +29,10 @@ func newProxyStream(client transfer.Courier_DeliverMailClient, viewOpts ...*View
 	return proxy
 }
 
-func (s *proxyStream) setPlanCount(count int) {
+func (s *proxyStream) setPlanCount(count int, circle bool) {
 	s.index = 1
 	s.count = count
+	s.circle = circle
 }
 
 func (s *proxyStream) sendFinish(planName string) error {
@@ -39,6 +41,9 @@ func (s *proxyStream) sendFinish(planName string) error {
 			s.cancel()
 		}
 		s.index++
+		if s.circle {
+			s.index %= s.count
+		}
 	}()
 	if s.client == nil {
 		return s.echoLocalData(planName)
@@ -49,7 +54,7 @@ func (s *proxyStream) sendFinish(planName string) error {
 	if err != nil {
 		return fmt.Errorf("send finish message: %w", err)
 	}
-	if s.index >= s.count {
+	if s.index >= s.count && !s.circle {
 		err = s.client.CloseSend()
 		if err != nil {
 			return fmt.Errorf("send close message: %w", err)

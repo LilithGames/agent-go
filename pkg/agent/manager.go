@@ -3,6 +3,7 @@ package agent
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
@@ -51,16 +52,7 @@ func (m *manager) startService() {
 	}
 }
 
-func (m *manager) reviewMail(mail *transfer.Mail) error {
-	switch mail.Action {
-	case transfer.ACTION_START_AGENT:
-		return m.startAgentEngine(mail.Content)
-	default:
-		return nil
-	}
-}
-
-func (m *manager) startAgentEngine(content []byte) error {
+func (m *manager) setEngineEnvs(content []byte) error {
 	var envs map[string]string
 	err := json.Unmarshal(content, &envs)
 	if err != nil {
@@ -69,14 +61,46 @@ func (m *manager) startAgentEngine(content []byte) error {
 	if len(envs) != 0 {
 		m.engine.setMetadata(envs)
 	}
+	return nil
+}
+
+func (m *manager) reviewMail(mail *transfer.Mail) error {
+	switch mail.Action {
+	case transfer.ACTION_START_AGENT:
+		return m.startAgentEngine(mail.Content)
+	case transfer.ACTION_START_CIRCLE:
+		return m.startAgentCircleEngine(mail.Content)
+	default:
+		return nil
+	}
+}
+
+func (m *manager) startAgentCircleEngine(content []byte) error {
+	err := m.setEngineEnvs(content)
+	if err != nil {
+		return err
+	}
+	m.stream.setPlanCount(len(m.engine.plans), true)
+	executors := m.buildExecutors()
+	for  {
+		for _, exec := range executors {
+			m.startExecutor(exec)
+		}
+	}
+}
+
+func (m *manager) startAgentEngine(content []byte) error {
+	err := m.setEngineEnvs(content)
+	if err != nil {
+		return fmt.Errorf("set envs error: %w", err)
+	}
 	m.startReadyService()
 	return nil
 }
 
-func (m *manager) startReadyService() {
-	m.stream.setPlanCount(len(m.engine.plans))
-	var executors []*executor
-	for _, plan := range m.engine.plans {
+func (m *manager) buildExecutors() []*executor {
+	executors := make([]*executor, len(m.engine.plans))
+	for index, plan := range m.engine.plans {
 		treeCfg := m.engine.trees[plan.TreeName]
 		tree := loader.CreateBevTreeFromConfig(treeCfg, m.engine.registerMap)
 		executor := &executor{
@@ -85,8 +109,16 @@ func (m *manager) startReadyService() {
 			tree:     tree,
 			metadata: m.engine.metadata,
 		}
-		executors = append(executors, executor)
-		m.startExecutor(executor)
+		executors[index] = executor
+	}
+	return executors
+}
+
+func (m *manager) startReadyService() {
+	m.stream.setPlanCount(len(m.engine.plans), false)
+	executors := m.buildExecutors()
+	for _, exec := range executors{
+		m.startExecutor(exec)
 	}
 }
 
