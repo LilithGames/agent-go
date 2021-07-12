@@ -37,10 +37,10 @@ func (s *proxyStream) setPlanCount(count int, circle bool) {
 
 func (s *proxyStream) sendFinish(planName string) error {
 	defer func() {
-		if s.index >= s.count {
+		s.index++
+		if s.index >= s.count && !s.circle {
 			s.cancel()
 		}
-		s.index++
 		if s.circle {
 			s.index %= s.count
 		}
