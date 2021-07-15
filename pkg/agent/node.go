@@ -29,7 +29,7 @@ func (n *Action) Initialize(params *config.BTNodeCfg) {
 
 func (n *Action) OnTick(tick *core.Tick) behavior3go.Status {
 	defer n.recoverPanic()
-	time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
+	time.Sleep(time.Millisecond * time.Duration(rand.Intn(100) + 10))
 	job := tick.GetTarget().(*job)
 	handler := job.handlers[n.name]
 	var outcome transfer.Outcome
