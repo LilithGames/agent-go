@@ -41,7 +41,15 @@ message Quantity {
   int64 maxTime = 4;
   int64 minTime = 5;
   int64 avgTime = 6;
-  map<string, int64> errorMap = 7;
+  int64 le50ms = 7;
+  int64 le100ms = 8;
+  int64 le200ms = 9;
+  int64 le500ms = 10;
+  int64 le1s = 11;
+  int64 le2s = 12;
+  int64 le5s = 13;
+  int64 le10s = 14;
+  map<string, int64> errorMap = 15;
 }
 
 message Quantities {
