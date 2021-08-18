@@ -6,7 +6,6 @@ import (
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/ghodss/yaml"
-	"github.com/magicsea/behavior3go"
 	"github.com/magicsea/behavior3go/config"
 	"github.com/magicsea/behavior3go/core"
 	"github.com/magicsea/behavior3go/loader"
@@ -38,29 +37,26 @@ func (c *Config) UnmarshalRawConfig(rawCfg []byte) error {
 }
 
 type executor struct {
-	handlers Handlers
 	plan     *transfer.Plan
 	tree     *core.BehaviorTree
 	metadata map[string]string
 }
 
 type Behavior struct {
-	handlers    Handlers
-	trees       map[string]*config.BTTreeCfg
-	registerMap *behavior3go.RegisterStructMaps
+	trees       map[string]config.BTTreeCfg
+	registerMap *core.RegisterStructMaps
 }
 
 func NewBehavior() *Behavior {
 	return &Behavior{
-		handlers: map[string]Handler{},
-		trees: map[string]*config.BTTreeCfg{},
-		registerMap: behavior3go.NewRegisterStructMaps(),
+		trees: map[string]config.BTTreeCfg{},
+		registerMap: core.NewRegisterStructMaps(),
 	}
 }
 
 func (b *Behavior) RegisterHandler(name string, handler Handler) {
-	b.handlers[name] = handler
-	b.registerMap.Register(name, new(Action))
+	action := &Action{handler: handler}
+	b.registerMap.Register(name, action)
 }
 
 func (b *Behavior) RegisterHandlers(handlers Handlers) {
@@ -69,7 +65,7 @@ func (b *Behavior) RegisterHandlers(handlers Handlers) {
 	}
 }
 
-func (b *Behavior) RegisterNode(name string, node interface{}) {
+func (b *Behavior) RegisterNode(name string, node core.IBaseNode) {
 	b.registerMap.Register(name, node)
 }
 
@@ -79,10 +75,12 @@ func (b *Behavior) RegisterTreeConfig(conf []byte) {
 	if err != nil {
 		log.Panic("unmarshal behavior tree: ", zap.Error(err))
 	}
+	err = loader.CheckTreeComplete(rawCfg.Data.Trees, b.registerMap)
+	if err != nil {
+		log.Panic("behavior tree check failed: ", zap.Error(err))
+	}
 	for _, tree := range rawCfg.Data.Trees {
-		var cfg = tree
-		loader.CreateBevTreeFromConfig(&cfg, b.registerMap)
-		b.trees[cfg.Title] = &cfg
+		b.trees[tree.Title] = tree
 	}
 }
 
@@ -96,10 +94,17 @@ func (b *Behavior) BuildEngineFromConfig(conf []byte) *Engine {
 	engine.metadata = cfg.Environments
 	for _, plan := range cfg.Plans {
 		if _, ok := b.trees[plan.TreeName]; !ok {
-			log.Panic("plan name not found")
+			log.Panic("plan name not found: " + plan.TreeName)
 		}
 	}
 	engine.plans = cfg.Plans
+	core.SetSubTreeLoadFunc(func(name string) *core.BehaviorTree {
+		if t, ok := b.trees[name]; ok {
+			return loader.CreateBevTreeFromConfig(&t, b.registerMap)
+		}
+		log.Panic("create sub tree not found.")
+		return nil
+	})
 	return engine
 }
 
@@ -114,23 +119,6 @@ type Engine struct {
 	*Behavior
 	plans       []*transfer.Plan
 	metadata    map[string]string
-}
-
-func (e *Engine) setTrees(trees []config.BTTreeCfg) {
-	for _, tree := range trees {
-		var treeCfg = tree
-		loader.CreateBevTreeFromConfig(&treeCfg, e.registerMap)
-		e.trees[tree.Title] = &treeCfg
-	}
-}
-
-func (e *Engine) setPlans(plans []*transfer.Plan) {
-	for _, plan := range plans {
-		if _, ok := e.trees[plan.TreeName]; !ok {
-			log.Panic("not found name in executors")
-		}
-	}
-	e.plans = plans
 }
 
 func (e *Engine) setMetadata(envs map[string]string) {

@@ -9,6 +9,10 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/rs/xid v1.3.0
 	go.uber.org/zap v1.16.0
+	golang.org/x/sys v0.0.0-20210112080510-489259a85091 // indirect
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.26.0
+	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
+
+replace github.com/magicsea/behavior3go => github.com/LilithGames/behavior3go v0.0.2

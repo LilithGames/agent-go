@@ -13,7 +13,6 @@ import (
 type job struct {
 	statPID   *actor.PID
 	metadata  map[string]string
-	handlers  Handlers
 	tree      *core.BehaviorTree
 	waitGroup *sync.WaitGroup
 	ctx       context.Context
@@ -21,11 +20,6 @@ type job struct {
 
 func newJob() *job {
 	return &job{}
-}
-
-func (t *job) withHandlers(handlers Handlers) *job {
-	t.handlers = handlers
-	return t
 }
 
 func (t *job) withCancelCtx(ctx context.Context) *job {

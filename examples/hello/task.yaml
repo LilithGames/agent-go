@@ -5,10 +5,5 @@ plans:
     parallel: 100
     interval: 1
 
-  - treeName: hellox
-    robotNum: 2
-    parallel: 100
-    interval: 1
-
 environments:
   branch: master

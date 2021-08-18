@@ -4,7 +4,7 @@
   "data": {
     "version": "0.3.0",
     "scope": "project",
-    "selectedTree": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
+    "selectedTree": "e933515f-3b2e-470f-9c6b-da54c2ca18c9",
     "trees": [
       {
         "version": "0.3.0",
@@ -12,86 +12,64 @@
         "id": "e933515f-3b2e-470f-9c6b-da54c2ca18c9",
         "title": "hello",
         "description": "",
-        "root": "cde32224-53ee-404a-86e5-fd7b666b4725",
+        "root": "5f187be4-fed2-4d74-85f6-8b8f681bd10a",
         "properties": {},
         "nodes": {
-          "cde32224-53ee-404a-86e5-fd7b666b4725": {
-            "id": "cde32224-53ee-404a-86e5-fd7b666b4725",
-            "name": "Sequence",
+          "5f187be4-fed2-4d74-85f6-8b8f681bd10a": {
+            "id": "5f187be4-fed2-4d74-85f6-8b8f681bd10a",
+            "name": "MemSequence",
             "category": "composite",
-            "title": "Sequence",
+            "title": "MemSequence",
             "description": "",
             "properties": {},
             "display": {
-              "x": -84,
+              "x": -396,
               "y": -12
             },
             "children": [
-              "9f710fb3-592c-4dc0-8502-87c78757d6be",
-              "de23fbf6-9fba-4837-8327-ffb32863b5df",
-              "51b58802-4a6c-442b-9223-e325cabeb996",
-              "355d98a1-f472-404b-80db-9fd698abd725",
-              "22ed45d4-167c-4fda-8d76-27900665d6c4"
+              "c3970d11-4ded-40d7-a0a3-696d7b46b676"
             ]
           },
-          "9f710fb3-592c-4dc0-8502-87c78757d6be": {
-            "id": "9f710fb3-592c-4dc0-8502-87c78757d6be",
-            "name": "helloA",
-            "category": "action",
-            "title": "helloA",
+          "c3970d11-4ded-40d7-a0a3-696d7b46b676": {
+            "id": "c3970d11-4ded-40d7-a0a3-696d7b46b676",
+            "name": "Repeater",
+            "category": "decorator",
+            "title": "Repeat <maxLoop>x",
+            "description": "",
+            "properties": {
+              "maxLoop": 2
+            },
+            "display": {
+              "x": -228,
+              "y": -12
+            },
+            "child": "1ea4759f-9ec6-4d7b-9a62-1ce92a1eacce"
+          },
+          "1ea4759f-9ec6-4d7b-9a62-1ce92a1eacce": {
+            "id": "1ea4759f-9ec6-4d7b-9a62-1ce92a1eacce",
+            "name": "MemSequence",
+            "category": "composite",
+            "title": "MemSequence",
             "description": "",
             "properties": {},
             "display": {
-              "x": 120,
-              "y": -192
-            }
+              "x": -60,
+              "y": -12
+            },
+            "children": [
+              "34cd00ac-31dd-4fb2-8827-f415c2095868"
+            ]
           },
-          "de23fbf6-9fba-4837-8327-ffb32863b5df": {
-            "id": "de23fbf6-9fba-4837-8327-ffb32863b5df",
-            "name": "helloB",
-            "category": "action",
-            "title": "helloB",
-            "description": "",
-            "properties": {},
-            "display": {
-              "x": 120,
-              "y": -96
-            }
-          },
-          "51b58802-4a6c-442b-9223-e325cabeb996": {
-            "id": "51b58802-4a6c-442b-9223-e325cabeb996",
-            "name": "helloC",
-            "category": "action",
-            "title": "helloC",
-            "description": "",
-            "properties": {},
-            "display": {
-              "x": 120,
-              "y": 0
-            }
-          },
-          "355d98a1-f472-404b-80db-9fd698abd725": {
-            "id": "355d98a1-f472-404b-80db-9fd698abd725",
-            "name": "helloD",
-            "category": "action",
-            "title": "helloD",
-            "description": "",
-            "properties": {},
-            "display": {
-              "x": 120,
-              "y": 108
-            }
-          },
-          "22ed45d4-167c-4fda-8d76-27900665d6c4": {
-            "id": "22ed45d4-167c-4fda-8d76-27900665d6c4",
-            "name": "helloE",
-            "category": "action",
-            "title": "helloE",
+          "34cd00ac-31dd-4fb2-8827-f415c2095868": {
+            "id": "34cd00ac-31dd-4fb2-8827-f415c2095868",
+            "name": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
+            "category": "tree",
+            "title": "subHello",
             "description": "",
             "properties": {},
             "display": {
               "x": 132,
-              "y": 192
+              "y": -12
             }
           }
         },
@@ -99,7 +77,7 @@
           "camera_x": 960,
           "camera_y": 508.5,
           "camera_z": 1,
-          "x": -192,
+          "x": -516,
           "y": -12
         }
       },
@@ -107,7 +85,7 @@
         "version": "0.3.0",
         "scope": "tree",
         "id": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
-        "title": "hellox",
+        "title": "subHello",
         "description": "",
         "root": "4624bd47-4cdd-4d95-8cbe-bf3217308b7f",
         "properties": {},
@@ -167,8 +145,8 @@
           }
         },
         "display": {
-          "camera_x": 960,
-          "camera_y": 508.5,
+          "camera_x": 816,
+          "camera_y": 372.5,
           "camera_z": 1,
           "x": -120,
           "y": 24
@@ -229,5 +207,5 @@
     ],
     "custom_folders": []
   },
-  "path": "D:\\hello.b3"
+  "path": "D:\\project\\github\\agent-go\\examples\\hello\\hello.b3"
 }

@@ -19,33 +19,32 @@ type Handlers map[string]Handler
 
 type Action struct {
 	core.Action
-	name string
+	handler Handler
 }
 
 func (n *Action) Initialize(params *config.BTNodeCfg) {
 	n.Action.Initialize(params)
-	n.name = params.Name
 }
 
 func (n *Action) OnTick(tick *core.Tick) behavior3go.Status {
 	defer n.recoverPanic()
 	time.Sleep(time.Millisecond * time.Duration(rand.Intn(100) + 10))
+	name := n.GetName()
 	job := tick.GetTarget().(*job)
-	handler := job.handlers[n.name]
 	var outcome transfer.Outcome
 	start := time.Now()
-	status, err := handler(tick)
+	status, err := n.handler(tick)
 	outcome.Status = transfer.STATUS(status)
 	if err != nil {
 		outcome.Err = err.Error()
 	}
-	outcome.Name = n.name
+	outcome.Name = name
 	if status == behavior3go.RUNNING {
-		outcome.Name = "polling_" + n.name
+		outcome.Name = "polling_" + name
 	}
 	outcome.Consume = time.Since(start).Nanoseconds()
 
-	beginKey := "begin:" + n.name
+	beginKey := "begin:" + name
 	begin := tick.Blackboard.GetMem(beginKey)
 	if begin != nil && status != behavior3go.RUNNING {
 		outcome.Consume = time.Since(begin.(time.Time)).Nanoseconds()

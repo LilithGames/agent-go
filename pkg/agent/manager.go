@@ -102,10 +102,9 @@ func (m *manager) buildExecutors() []*executor {
 	executors := make([]*executor, len(m.engine.plans))
 	for index, plan := range m.engine.plans {
 		treeCfg := m.engine.trees[plan.TreeName]
-		tree := loader.CreateBevTreeFromConfig(treeCfg, m.engine.registerMap)
+		tree := loader.CreateBevTreeFromConfig(&treeCfg, m.engine.registerMap)
 		executor := &executor{
 			plan:     plan,
-			handlers: m.engine.handlers,
 			tree:     tree,
 			metadata: m.engine.metadata,
 		}
@@ -135,7 +134,6 @@ func (m *manager) startExecutor(executor *executor) {
 
 	job := newJob().
 		withMetadata(executor.metadata).
-		withHandlers(executor.handlers).
 		withCancelCtx(m.stream.ctx).
 		withBeTree(executor.tree).
 		withWaitGroup(wg).
