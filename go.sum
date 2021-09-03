@@ -7,8 +7,8 @@ github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
-github.com/LilithGames/behavior3go v0.0.4 h1:lGgTf5chRFoGLgh5QbdlgO4PJPO8ZQDcV/9dkDMTa2Y=
-github.com/LilithGames/behavior3go v0.0.4/go.mod h1:pjoSwYeksuj/byi0A78odYWQF2ynZmyUpj1t/sB8Z2Y=
+github.com/LilithGames/behavior3go v0.0.5 h1:It4sP47KEsZR9H0BoBzgM4vmwjiaKYY6zwH1KnLL0z8=
+github.com/LilithGames/behavior3go v0.0.5/go.mod h1:pjoSwYeksuj/byi0A78odYWQF2ynZmyUpj1t/sB8Z2Y=
 github.com/LilithGames/go-graphql-client v0.3.0 h1:LiMRDmPeH9YNHFC07EvSksQ02BgX2snkIRUwA5W742Y=
 github.com/LilithGames/go-graphql-client v0.3.0/go.mod h1:ovhXpnBL/+pYmmdYHndovgAc/wmhaXKvKwJETjtMomQ=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
