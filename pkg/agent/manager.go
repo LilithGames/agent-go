@@ -11,6 +11,7 @@ import (
 	"github.com/magicsea/behavior3go/loader"
 	"go.uber.org/zap"
 	"io"
+	"os"
 	"sync"
 	"time"
 )
@@ -59,8 +60,11 @@ func (m *manager) setEngineEnvs(content []byte) error {
 	if err != nil {
 		return err
 	}
-	if len(envs) != 0 {
-		m.engine.setMetadata(envs)
+	for k, v :=  range envs {
+		err = os.Setenv(k, v)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -108,7 +112,6 @@ func (m *manager) buildExecutors() []*executor {
 			treeCreator: func() *core.BehaviorTree {
 				return loader.CreateBevTreeFromConfig(&treeCfg, m.engine.registerMap)
 			},
-			metadata: m.engine.metadata,
 		}
 		executors[index] = executor
 	}
@@ -117,6 +120,9 @@ func (m *manager) buildExecutors() []*executor {
 
 func (m *manager) startReadyService() {
 	m.stream.setPlanCount(len(m.engine.plans), false)
+	for k, v := range m.engine.envs {
+		_ = os.Setenv(k, v)
+	}
 	executors := m.buildExecutors()
 	for _, exec := range executors{
 		m.startExecutor(exec)
@@ -136,7 +142,6 @@ func (m *manager) startExecutor(executor *executor) {
 
 	for i := 0; i < int(executor.plan.RobotNum); i++ {
 		job := newJob().
-			withMetadata(executor.metadata).
 			withCancelCtx(m.stream.ctx).
 			withWaitGroup(wg).
 			withStatPID(actuaryID).

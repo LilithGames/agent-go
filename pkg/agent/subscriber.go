@@ -10,6 +10,7 @@ import (
 	"github.com/magicsea/behavior3go/composites"
 	"github.com/magicsea/behavior3go/core"
 	"go.uber.org/zap"
+	"os"
 	"time"
 )
 
@@ -20,12 +21,6 @@ type MessageHandler func(message *json.RawMessage, err error) error
 func WithLog(log func(args ...interface{})) ClientOption {
 	return func(client *graphql.SubscriptionClient) {
 		client.WithLog(log)
-	}
-}
-
-func WithConnParam(param map[string]interface{}) ClientOption {
-	return func(client *graphql.SubscriptionClient) {
-		client.WithConnectionParams(param)
 	}
 }
 
@@ -61,12 +56,29 @@ func WithTimeout(timeout time.Duration) ClientOption {
 
 type GqlSubscription struct {
 	composites.Subscription
+	token string
 }
 
-func NewGqlSubscription(url string, options ...ClientOption) *GqlSubscription {
+func (g *GqlSubscription) OnOpen(tick *core.Tick) {
+	rawToken := tick.Blackboard.GetMem("token")
+	if rawToken != nil {
+		g.token = rawToken.(string)
+	}
+}
+
+func NewGqlSubscription(options ...ClientOption) *GqlSubscription {
 	subscription := &GqlSubscription{}
 	subscription.ClientCreator = func() composites.SubClient {
-		client := graphql.NewSubscriptionClient(url)
+		backend := os.Getenv("backend")
+		if backend == "" {
+			log.Panic("graphql backend not found")
+		}
+		client := graphql.NewSubscriptionClient(backend)
+		if subscription.token != "" {
+			client.WithConnectionParams(map[string]interface{}{
+				"Authorization": subscription.token,
+			})
+		}
 		for _, option :=  range options {
 			option(client)
 		}
@@ -104,8 +116,11 @@ func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, handler MessageHan
 			log.Panic("unmarshal message error", zap.Error(errj))
 		}
 		var outcome transfer.Outcome
-		outcome.Consume = time.Now().Unix() - rawMsg.Extensions.Debug.SendTime
-		err = handler(rawMsg.Data, err)
+		start := time.Unix(rawMsg.Extensions.Debug.SendTime, 0).Unix()
+		outcome.Consume = time.Now().Unix() - start
+		if handler != nil {
+			err = handler(rawMsg.Data, err)
+		}
 		outcome.Class = transfer.CLASS_EVENT
 		outcome.Name = name
 		outcome.Status = transfer.STATUS_SUCCESS

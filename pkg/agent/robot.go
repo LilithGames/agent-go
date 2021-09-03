@@ -12,7 +12,6 @@ import (
 
 type job struct {
 	statPID   *actor.PID
-	metadata  map[string]string
 	tree      *core.BehaviorTree
 	waitGroup *sync.WaitGroup
 	ctx       context.Context
@@ -42,11 +41,6 @@ func (t *job) withStatPID(pid *actor.PID) *job {
 	return t
 }
 
-func (t *job) withMetadata(metadata map[string]string) *job {
-	t.metadata = metadata
-	return t
-}
-
 type robot struct {
 }
 
@@ -65,7 +59,6 @@ func (r *robot) execute(ctx actor.Context, task *job) {
 	outcome := transfer.Outcome{Name: "whole_process"}
 	board := core.NewBlackboard()
 	board.SetMem("actorCtx", ctx)
-	board.SetMem("metadata", task.metadata)
 	var status behavior3go.Status
 	for {
 		status := task.tree.Tick(task, board)

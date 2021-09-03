@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/LilithGames/agent-go/pkg/agent"
 	"github.com/hasura/go-graphql-client"
 	"github.com/magicsea/behavior3go"
@@ -49,10 +48,7 @@ func HelloE(tick *core.Tick) (behavior3go.Status, error) {
 
 
 func NewSubscription() core.IBaseNode {
-	url := "ws://host.docker.internal:8085/query"
-	// url := "ws://127.0.0.1:8085/query"
-	subscription := agent.NewGqlSubscription(url, agent.WithLog(log.Println))
-	fmt.Printf("subscription node %p \n", subscription)
+	subscription := agent.NewGqlSubscription(agent.WithLog(log.Println))
 	return subscription
 }
 

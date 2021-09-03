@@ -43,7 +43,6 @@ func (c *Config) UnmarshalRawConfig(rawCfg []byte) error {
 type executor struct {
 	plan     *transfer.Plan
 	treeCreator func() *core.BehaviorTree
-	metadata map[string]string
 }
 
 type Behavior struct {
@@ -103,7 +102,7 @@ func (b *Behavior) BuildEngineFromConfig(conf []byte) *Engine {
 		log.Panic("unmarshal plan config", zap.Error(err))
 	}
 	engine := &Engine{Behavior: b}
-	engine.metadata = cfg.Environments
+	engine.envs = cfg.Environments
 	for _, plan := range cfg.Plans {
 		if _, ok := b.trees[plan.TreeName]; !ok {
 			log.Panic("plan name not found: " + plan.TreeName)
@@ -122,23 +121,13 @@ func (b *Behavior) BuildEngineFromConfig(conf []byte) *Engine {
 
 func (b *Behavior) BuildTestEngine(envs map[string]string, plan *transfer.Plan) *Engine {
 	engine := &Engine{Behavior: b}
-	engine.metadata = envs
+	engine.envs = envs
 	engine.plans = append(engine.plans, plan)
 	return engine
 }
 
 type Engine struct {
 	*Behavior
-	plans       []*transfer.Plan
-	metadata    map[string]string
-}
-
-func (e *Engine) setMetadata(envs map[string]string) {
-	if len(e.metadata) == 0 {
-		e.metadata = envs
-		return
-	}
-	for name, value := range envs {
-		e.metadata[name] = value
-	}
+	plans   []*transfer.Plan
+	envs    map[string]string
 }
