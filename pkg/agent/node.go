@@ -15,8 +15,6 @@ import (
 
 type Handler func(tick *core.Tick) (behavior3go.Status, error)
 
-type Handlers map[string]Handler
-
 type Action struct {
 	core.Action
 	handler Handler
@@ -32,6 +30,7 @@ func (n *Action) OnTick(tick *core.Tick) behavior3go.Status {
 	name := n.GetName()
 	job := tick.GetTarget().(*job)
 	var outcome transfer.Outcome
+	outcome.Class = transfer.CLASS_HANDLER
 	start := time.Now()
 	status, err := n.handler(tick)
 	outcome.Status = transfer.STATUS(status)

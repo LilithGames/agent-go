@@ -37,45 +37,116 @@
             "title": "Repeat <maxLoop>x",
             "description": "",
             "properties": {
-              "maxLoop": 2
+              "maxLoop": 1
             },
             "display": {
               "x": -228,
               "y": -12
             },
-            "child": "1ea4759f-9ec6-4d7b-9a62-1ce92a1eacce"
+            "child": "859b39a0-c7c6-4f92-99b2-d4e98a4a780d"
           },
-          "1ea4759f-9ec6-4d7b-9a62-1ce92a1eacce": {
-            "id": "1ea4759f-9ec6-4d7b-9a62-1ce92a1eacce",
-            "name": "MemSequence",
+          "859b39a0-c7c6-4f92-99b2-d4e98a4a780d": {
+            "id": "859b39a0-c7c6-4f92-99b2-d4e98a4a780d",
+            "name": "Parallel",
             "category": "composite",
-            "title": "MemSequence",
+            "title": "Parallel",
             "description": "",
             "properties": {},
             "display": {
-              "x": -60,
+              "x": -72,
               "y": -12
             },
             "children": [
-              "34cd00ac-31dd-4fb2-8827-f415c2095868"
+              "730b6bad-df40-45ad-81d3-597f7dcbb4a9",
+              "07d54a4d-66e0-461a-80d6-3410aa3510cc",
+              "7763f7b2-4fe9-4c0c-a7ff-68d7eda4f5ef"
             ]
           },
-          "34cd00ac-31dd-4fb2-8827-f415c2095868": {
-            "id": "34cd00ac-31dd-4fb2-8827-f415c2095868",
+          "730b6bad-df40-45ad-81d3-597f7dcbb4a9": {
+            "id": "730b6bad-df40-45ad-81d3-597f7dcbb4a9",
+            "name": "Repeater",
+            "category": "decorator",
+            "title": "Repeat <maxLoop>x",
+            "description": "",
+            "properties": {
+              "maxLoop": 100
+            },
+            "display": {
+              "x": 156,
+              "y": -132
+            },
+            "child": "9d9d0ffa-0384-41dc-9830-a8798271e68e"
+          },
+          "56555abf-099a-4ae2-92c0-8ebb90a2fa9a": {
+            "id": "56555abf-099a-4ae2-92c0-8ebb90a2fa9a",
             "name": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
             "category": "tree",
             "title": "subHello",
             "description": "",
             "properties": {},
             "display": {
-              "x": 132,
+              "x": 408,
               "y": -12
+            }
+          },
+          "07d54a4d-66e0-461a-80d6-3410aa3510cc": {
+            "id": "07d54a4d-66e0-461a-80d6-3410aa3510cc",
+            "name": "Repeater",
+            "category": "decorator",
+            "title": "Repeat <maxLoop>x",
+            "description": "",
+            "properties": {
+              "maxLoop": 10
+            },
+            "display": {
+              "x": 156,
+              "y": -12
+            },
+            "child": "56555abf-099a-4ae2-92c0-8ebb90a2fa9a"
+          },
+          "9d9d0ffa-0384-41dc-9830-a8798271e68e": {
+            "id": "9d9d0ffa-0384-41dc-9830-a8798271e68e",
+            "name": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
+            "category": "tree",
+            "title": "subHello",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 396,
+              "y": -132
+            }
+          },
+          "7763f7b2-4fe9-4c0c-a7ff-68d7eda4f5ef": {
+            "id": "7763f7b2-4fe9-4c0c-a7ff-68d7eda4f5ef",
+            "name": "TestSubscription",
+            "category": "composite",
+            "title": "TestSubscription",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 168,
+              "y": 144
+            },
+            "children": [
+              "3ce1e4cf-4eec-474a-8e29-cf8ab14bcddd"
+            ]
+          },
+          "3ce1e4cf-4eec-474a-8e29-cf8ab14bcddd": {
+            "id": "3ce1e4cf-4eec-474a-8e29-cf8ab14bcddd",
+            "name": "TestSubscriber",
+            "category": "action",
+            "title": "TestSubscriber",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 420,
+              "y": 144
             }
           }
         },
         "display": {
           "camera_x": 960,
-          "camera_y": 508.5,
+          "camera_y": 440.125,
           "camera_z": 1,
           "x": -516,
           "y": -12
@@ -151,6 +222,66 @@
           "x": -120,
           "y": 24
         }
+      },
+      {
+        "version": "0.3.0",
+        "scope": "tree",
+        "id": "efa2655f-7539-4628-a1d6-c401aa4211fa",
+        "title": "subcription",
+        "description": "",
+        "root": "70041374-3d75-4d07-87c1-f3270adf3dca",
+        "properties": {},
+        "nodes": {
+          "70041374-3d75-4d07-87c1-f3270adf3dca": {
+            "id": "70041374-3d75-4d07-87c1-f3270adf3dca",
+            "name": "Parallel",
+            "category": "composite",
+            "title": "Parallel",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -240,
+              "y": -36
+            },
+            "children": [
+              "66e17b2b-528d-4ee9-8073-690f08843856"
+            ]
+          },
+          "c9c9d022-ca8f-4140-8ab3-3ca618fb2820": {
+            "id": "c9c9d022-ca8f-4140-8ab3-3ca618fb2820",
+            "name": "helloA",
+            "category": "action",
+            "title": "helloA",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 228,
+              "y": -108
+            }
+          },
+          "66e17b2b-528d-4ee9-8073-690f08843856": {
+            "id": "66e17b2b-528d-4ee9-8073-690f08843856",
+            "name": "Repeater",
+            "category": "decorator",
+            "title": "Repeat <maxLoop>x",
+            "description": "",
+            "properties": {
+              "maxLoop": 100
+            },
+            "display": {
+              "x": 12,
+              "y": -108
+            },
+            "child": "c9c9d022-ca8f-4140-8ab3-3ca618fb2820"
+          }
+        },
+        "display": {
+          "camera_x": 960,
+          "camera_y": 508.5,
+          "camera_z": 1,
+          "x": -444,
+          "y": -36
+        }
       }
     ],
     "custom_nodes": [
@@ -200,6 +331,56 @@
         "name": "helloE",
         "category": "action",
         "title": "helloE",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "Parallel",
+        "category": "composite",
+        "title": "Parallel",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "friendEvent",
+        "category": "action",
+        "title": "friendEvent",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "isOnline",
+        "category": "action",
+        "title": "isOnline",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "TestSubscription",
+        "category": "composite",
+        "title": "TestSubscription",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "TestSubscriber",
+        "category": "action",
+        "title": "TestSubscriber",
         "description": null,
         "properties": {},
         "parent": null

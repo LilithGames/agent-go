@@ -7,6 +7,7 @@ import (
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
+	"github.com/magicsea/behavior3go/core"
 	"github.com/magicsea/behavior3go/loader"
 	"go.uber.org/zap"
 	"io"
@@ -102,10 +103,11 @@ func (m *manager) buildExecutors() []*executor {
 	executors := make([]*executor, len(m.engine.plans))
 	for index, plan := range m.engine.plans {
 		treeCfg := m.engine.trees[plan.TreeName]
-		tree := loader.CreateBevTreeFromConfig(&treeCfg, m.engine.registerMap)
 		executor := &executor{
 			plan:     plan,
-			tree:     tree,
+			treeCreator: func() *core.BehaviorTree {
+				return loader.CreateBevTreeFromConfig(&treeCfg, m.engine.registerMap)
+			},
 			metadata: m.engine.metadata,
 		}
 		executors[index] = executor
@@ -132,14 +134,13 @@ func (m *manager) startExecutor(executor *executor) {
 	wg.Add(robotNum)
 	defer wg.Wait()
 
-	job := newJob().
-		withMetadata(executor.metadata).
-		withCancelCtx(m.stream.ctx).
-		withBeTree(executor.tree).
-		withWaitGroup(wg).
-		withStatPID(actuaryID)
-
 	for i := 0; i < int(executor.plan.RobotNum); i++ {
+		job := newJob().
+			withMetadata(executor.metadata).
+			withCancelCtx(m.stream.ctx).
+			withWaitGroup(wg).
+			withStatPID(actuaryID).
+			withBeTree(executor.treeCreator())
 		con := int(executor.plan.Parallel)
 		interval := time.Second * time.Duration(executor.plan.Interval)
 		if con != 0 && i%con == 0 && i/con > 0 {

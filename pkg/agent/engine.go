@@ -12,6 +12,10 @@ import (
 	"go.uber.org/zap"
 )
 
+type Handlers map[string]Handler
+
+type Nodes map[string]core.NodeCreator
+
 type Config struct {
 	Plans    []*transfer.Plan
 	Environments map[string]string
@@ -38,7 +42,7 @@ func (c *Config) UnmarshalRawConfig(rawCfg []byte) error {
 
 type executor struct {
 	plan     *transfer.Plan
-	tree     *core.BehaviorTree
+	treeCreator func() *core.BehaviorTree
 	metadata map[string]string
 }
 
@@ -55,8 +59,10 @@ func NewBehavior() *Behavior {
 }
 
 func (b *Behavior) RegisterHandler(name string, handler Handler) {
-	action := &Action{handler: handler}
-	b.registerMap.Register(name, action)
+	creator := func() core.IBaseNode {
+		return &Action{handler: handler}
+	}
+	b.registerMap.Register(name, creator)
 }
 
 func (b *Behavior) RegisterHandlers(handlers Handlers) {
@@ -65,8 +71,14 @@ func (b *Behavior) RegisterHandlers(handlers Handlers) {
 	}
 }
 
-func (b *Behavior) RegisterNode(name string, node core.IBaseNode) {
-	b.registerMap.Register(name, node)
+func (b *Behavior) RegisterNode(name string, creator core.NodeCreator) {
+	b.registerMap.Register(name, creator)
+}
+
+func (b *Behavior) RegisterNodes(nodes Nodes) {
+	for name, node := range nodes {
+		b.RegisterNode(name, node)
+	}
 }
 
 func (b *Behavior) RegisterTreeConfig(conf []byte) {

@@ -12,56 +12,40 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-func newQuantity(name string) *transfer.Quantity {
+var quantities *transfer.Quantities
+
+func init()  {
+	quantities = newQuantities()
+}
+
+func newQuantity(name string, class transfer.CLASS) *transfer.Quantity {
 	var q transfer.Quantity
 	q.ErrorMap = make(map[string]int64)
 	q.Name = name
+	q.Class = class
 	return &q
 }
 
-type quantities struct {
-	Name      string
-	Value     map[string]*transfer.Quantity `json:"value"`
-	ErrResult map[string]map[string]int
-}
-
-func newQuantities(name string) *quantities {
-	return &quantities{
-		Name:      name,
-		Value:     map[string]*transfer.Quantity{},
-		ErrResult: map[string]map[string]int{},
+func newQuantities() *transfer.Quantities {
+	return &transfer.Quantities{
+		Handler: map[string]*transfer.Quantity{},
+		Event:   map[string]*transfer.Quantity{},
 	}
 }
 
-func computeAverage(val1, num1, val2, num2 int64) int64 {
-	total := num1 + num2
-	part1 := val1 / total * num1
-	part2 := val2 / total * num2
-	return part1 + part2
-}
-
-func (q *quantities) print(opts ...*ViewOpt) {
-	q.printQuantitySlice(opts...)
-	q.printErrorMessage(opts...)
-}
-
-func (q *quantities) printQuantitySlice(opts ...*ViewOpt) {
-	quantities := make([]*transfer.Quantity, 0)
-	for _, quantity := range q.Value {
-		quantities = append(quantities, quantity)
-	}
-	if len(quantities) <= 1 {
+func printQuantitySlice(name string, qs map[string]*transfer.Quantity, opts ...*ViewOpt) {
+	if len(qs) == 0 {
 		return
 	}
 	opt := mergeViewOpt(opts...)
 	buf := bytes.NewBuffer(nil)
 	table := tablewriter.NewWriter(buf)
 	opt.apply(table)
-	header := []string{"Name", "Total", "Fail", "Min", "Average", "Max"}
+	header := []string{"Name", "Total", "Fail", " 0~50MS", "50~100MS", "100~200MS", "200~500MS", "500~1S", "1~2S", "2~5S", "5~10S"}
 	table.SetHeader(header)
 	names := make([]string, 0)
 	var qm = make(map[string]*transfer.Quantity)
-	for _, q := range quantities {
+	for _, q := range qs {
 		if strings.Contains(q.Name, "polling_") {
 			row := createQuantityRow(q)
 			table.Append(row)
@@ -72,7 +56,7 @@ func (q *quantities) printQuantitySlice(opts ...*ViewOpt) {
 	}
 	if table.NumLines() > 0 {
 		table.Render()
-		title := "Polling Statistic"
+		title := "Polling Stat"
 		fmt.Printf("\r\n%s\r\n%s", title, buf.String())
 		table.ClearRows()
 		buf.Reset()
@@ -85,28 +69,28 @@ func (q *quantities) printQuantitySlice(opts ...*ViewOpt) {
 	}
 	table.SetRowLine(true)
 	table.Render()
-	title := fmt.Sprintf("Plan Statistic(%s): ", q.Name)
+	title := fmt.Sprintf("Plan Stat (%s)", name)
 	fmt.Printf("\r\n%s\r\n%s", title, buf.String())
 }
 
-func createQuantityRow(stat *transfer.Quantity) []string {
+func createQuantityRow(q *transfer.Quantity) []string {
 	var row []string
-	row = append(row, stat.Name)
-	row = append(row, strconv.Itoa(int(stat.TotalNum)))
-	row = append(row, strconv.Itoa(int(stat.ErrorNum)))
-	row = append(row, toTimeStr(stat.MinTime))
-	row = append(row, toTimeStr(stat.AvgTime))
-	row = append(row, toTimeStr(stat.MaxTime))
+	row = append(row, q.Name)
+	row = append(row, strconv.Itoa(int(q.TotalNum)))
+	row = append(row, strconv.Itoa(int(q.ErrorNum)))
+	row = append(row, strconv.Itoa(int(q.Le50Ms)))
+	row = append(row, strconv.Itoa(int(q.Le100Ms)))
+	row = append(row, strconv.Itoa(int(q.Le200Ms)))
+	row = append(row, strconv.Itoa(int(q.Le500Ms)))
+	row = append(row, strconv.Itoa(int(q.Le1S)))
+	row = append(row, strconv.Itoa(int(q.Le2S)))
+	row = append(row, strconv.Itoa(int(q.Le5S)))
+	row = append(row, strconv.Itoa(int(q.Le10S)))
 	return row
 }
 
-func toTimeStr(val int64) string {
-	dur := time.Duration(val)
-	return dur.Round(time.Millisecond).String()
-}
-
-func (q *quantities) printErrorMessage(opts ...*ViewOpt) {
-	if len(q.ErrResult) == 0 {
+func printErrorMessage(name string, qs map[string]*transfer.Quantity, opts ...*ViewOpt) {
+	if len(qs) == 0 {
 		return
 	}
 	opt := mergeViewOpt(opts...)
@@ -115,46 +99,79 @@ func (q *quantities) printErrorMessage(opts ...*ViewOpt) {
 	opt.apply(table)
 	header := []string{"Name", "Reason", "Count"}
 	table.SetHeader(header)
-	for name, es := range q.ErrResult {
+	for _, q := range qs {
+		es := q.ErrorMap
 		for err, count := range es {
 			row := make([]string, len(header))
 			row[0] = name
 			row[1] = err
-			row[2] = strconv.Itoa(count)
+			row[2] = strconv.Itoa(int(count))
 			table.Append(row)
 		}
 	}
+	if table.NumLines() == 0 {
+		return
+	}
 	table.SetRowLine(true)
 	table.Render()
-	title := fmt.Sprintf("Task Error(%s): ", q.Name)
+	title := fmt.Sprintf("Task Error (%s): ", name)
 	fmt.Printf("\r\n%s\r\n%s", title, buf.String())
 }
 
-func putReportData(quantities *quantities, outcomes []*transfer.Outcome) {
+func pushData(outcomes []*transfer.Outcome) {
 	for _, outcome := range outcomes {
-		q, ok := quantities.Value[outcome.Name]
+		var value map[string]*transfer.Quantity
+		switch outcome.Class {
+		case transfer.CLASS_HANDLER:
+			value = quantities.Handler
+		default:
+			value = quantities.Event
+		}
+		q, ok := value[outcome.Name]
 		if !ok {
-			q = newQuantity(outcome.Name)
-			quantities.Value[outcome.Name] = q
+			q = newQuantity(outcome.Name, outcome.Class)
+			value[outcome.Name] = q
 		}
-		if q.MinTime == 0 || outcome.Consume < q.MinTime {
-			q.MinTime = outcome.Consume
+		ms := int64(time.Millisecond)
+		s := int64(time.Second)
+		switch {
+		case outcome.Consume <= ms*50:
+			q.Le50Ms++
+		case outcome.Consume <= ms*100 && outcome.Consume > ms*50:
+			q.Le100Ms++
+		case outcome.Consume <= ms*200 && outcome.Consume > ms*100:
+			q.Le200Ms++
+		case outcome.Consume <= ms*500 && outcome.Consume > ms*200:
+			q.Le500Ms++
+		case outcome.Consume <= s*1 && outcome.Consume > ms*500:
+			q.Le1S++
+		case outcome.Consume <= s*2 && outcome.Consume > s*1:
+			q.Le2S++
+		case outcome.Consume <= s*5 && outcome.Consume > s*2:
+			q.Le5S++
+		case outcome.Consume <= s*10 && outcome.Consume > s*5:
+			q.Le10S++
 		}
-		if outcome.Consume > q.MaxTime {
-			q.MaxTime = outcome.Consume
-		}
-		q.AvgTime = computeAverage(q.AvgTime, q.TotalNum, outcome.Consume, 1)
 		q.TotalNum++
 		if outcome.Status == transfer.STATUS_FAILURE {
 			q.ErrorNum++
 		}
 		if outcome.Err != "" {
-			es, ok := quantities.ErrResult[outcome.Name]
-			if !ok {
-				es = make(map[string]int)
-				quantities.ErrResult[outcome.Name] = es
-			}
-			es[outcome.Err]++
+			q.ErrorMap[outcome.Err]++
 		}
 	}
+}
+
+func pushLocalData(planName string, report *transfer.Report) error {
+	pushData(report.Outcomes)
+	return nil
+}
+
+func echoLocalData(planName string, view *ViewOpt) error {
+	printQuantitySlice(planName + ":H", quantities.Handler, view)
+	printQuantitySlice(planName + ":E", quantities.Event, view)
+	printErrorMessage(planName + ":H", quantities.Handler, view)
+	printErrorMessage(planName + ":E", quantities.Handler, view)
+	quantities = newQuantities()
+	return nil
 }

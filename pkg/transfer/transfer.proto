@@ -50,17 +50,20 @@ message Quantity {
   int64 le5s = 13;
   int64 le10s = 14;
   map<string, int64> errorMap = 15;
+  CLASS class = 16;
 }
 
 message Quantities {
-  map<string, Quantity> value = 1;
+  map<string, Quantity> handler = 1;
+  map<string, Quantity> event = 2;
 }
 
 message PlanReply {
   string name = 1;
   int64 beginTime = 2;
   int64 endTime = 3;
-  repeated Quantity quantities = 4;
+  repeated Quantity hQuantities = 4;
+  repeated Quantity eQuantities = 5;
 }
 
 enum STATUS {
@@ -71,16 +74,23 @@ enum STATUS {
   ERROR   = 4;
 }
 
+enum CLASS {
+  HANDLER = 0;
+  EVENT = 1;
+}
+
 message Outcome {
   string name = 1;
   STATUS status = 2;
   int64 consume = 3;
   string err = 4;
+  CLASS class = 5;
 }
 
 message Report {
   string planID = 1;
-  repeated Outcome outcomes = 2;
+  int64 eventNum = 2;
+  repeated Outcome outcomes = 3;
 }
 
 service Courier {

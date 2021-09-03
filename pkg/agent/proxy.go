@@ -16,7 +16,6 @@ type proxyStream struct {
 	count      int
 	circle     bool
 	id         string
-	quantities *quantities
 	ctx        context.Context
 	cancel     context.CancelFunc
 	client     transfer.Courier_DeliverMailClient
@@ -46,7 +45,7 @@ func (s *proxyStream) sendFinish(planName string) error {
 		}
 	}()
 	if s.client == nil {
-		return s.echoLocalData(planName)
+		return echoLocalData(planName, s.viewOpt)
 	}
 	planID := s.formatPlanID(planName)
 	mail := &transfer.Mail{Action: transfer.ACTION_FINISH_PLAN, Content: []byte(planID)}
@@ -65,7 +64,7 @@ func (s *proxyStream) sendFinish(planName string) error {
 
 func (s *proxyStream) sendReport(planName string, report *transfer.Report) error {
 	if s.client == nil {
-		return s.pushLocalData(planName, report)
+		return pushLocalData(planName, report)
 	}
 	report.PlanID = s.formatPlanID(planName)
 	content, err := proto.Marshal(report)
@@ -85,20 +84,6 @@ func (s *proxyStream) Recv() (*transfer.Mail, error) {
 		return s.client.Recv()
 	}
 	return nil, nil
-}
-
-func (s *proxyStream) pushLocalData(planName string, report *transfer.Report) error {
-	if s.quantities == nil {
-		s.quantities = newQuantities(planName)
-	}
-	putReportData(s.quantities, report.Outcomes)
-	return nil
-}
-
-func (s *proxyStream) echoLocalData(planName string) error {
-	s.quantities.print(s.viewOpt)
-	s.quantities = newQuantities(planName)
-	return nil
 }
 
 func (s *proxyStream) formatPlanID(planName string) string {

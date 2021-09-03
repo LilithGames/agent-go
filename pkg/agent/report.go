@@ -10,16 +10,16 @@ import (
 type reporter struct {
 	index    int
 	capacity int
+	eventNum int64
 	planName string
 	stream   *proxyStream
 	outcomes []*transfer.Outcome
 }
 
 func reporterFactory(planName string, stream *proxyStream) func() actor.Actor {
-	index, capacity := 0, 100
+	capacity := 100
 	return func() actor.Actor {
 		return &reporter{
-			index:    index,
 			capacity: capacity,
 			planName: planName,
 			stream:   stream,
@@ -40,11 +40,14 @@ func (r *reporter) Receive(ctx actor.Context) {
 func (r *reporter) appendOutcome(outcome *transfer.Outcome) {
 	if r.index >= r.capacity {
 		r.sendStatMail()
-		r.index = 0
+		r.index, r.eventNum = 0, 0
 		r.outcomes = make([]*transfer.Outcome, r.capacity)
 	}
 	r.outcomes[r.index] = outcome
 	r.index++
+	if outcome.Class == transfer.CLASS_EVENT {
+		r.eventNum++
+	}
 }
 
 func (r *reporter) stopReport() {
@@ -59,7 +62,7 @@ func (r *reporter) sendStatMail() {
 	if r.index < r.capacity {
 		r.outcomes = r.outcomes[:r.index]
 	}
-	report := &transfer.Report{Outcomes: r.outcomes}
+	report := &transfer.Report{Outcomes: r.outcomes, EventNum: r.eventNum}
 	err := r.stream.sendReport(r.planName, report)
 	if err != nil {
 		log.Panic("receive error where send stat", zap.Error(err))

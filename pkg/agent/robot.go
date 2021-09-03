@@ -77,5 +77,6 @@ func (r *robot) execute(ctx actor.Context, task *job) {
 	task.waitGroup.Done()
 	outcome.Status = transfer.STATUS(status)
 	outcome.Consume = time.Since(start).Nanoseconds()
+	outcome.Class = transfer.CLASS_HANDLER
 	ctx.Send(task.statPID, &outcome)
 }

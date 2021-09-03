@@ -14,6 +14,8 @@ var helloB3 []byte
 func main() {
 	behavior := agent.NewBehavior()
 	behavior.RegisterHandlers(HelloHandlers())
+	behavior.RegisterNode("TestSubscription", NewSubscription)
+	behavior.RegisterNode("TestSubscriber", NewSubscriber)
 	behavior.RegisterTreeConfig(helloB3)
 	engine := behavior.BuildEngineFromConfig(task)
 	a := agent.NewAgent(engine)

@@ -2,6 +2,8 @@ package agent
 
 import (
 	"context"
+	"github.com/LilithGames/agent-go/tools/metric"
+	"net/http"
 	"os"
 
 	"github.com/LilithGames/agent-go/pkg/transfer"
@@ -37,6 +39,7 @@ func (a *Agent) Start() {
 	if a.endpoint == "" {
 		a.startDefaultAgent()
 	} else {
+		go a.startMetricServer()
 		a.startClusterAgent()
 	}
 }
@@ -73,4 +76,11 @@ func (a *Agent) newOutgoingContext() context.Context {
 	agentID := xid.New().String()
 	data := map[string]string{"agentID": agentID, "ID": os.Getenv("ID")}
 	return metadata.NewOutgoingContext(context.Background(), metadata.New(data))
+}
+
+func (a *Agent) startMetricServer() {
+	exporter := metric.MetricsExport()
+	http.HandleFunc("/metrics", exporter.ServeHTTP)
+	err := http.ListenAndServe(":2222", nil)
+	log.Panic("start metric error", zap.Error(err))
 }
