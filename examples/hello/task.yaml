@@ -1,9 +1,9 @@
 plans:
 
-  - treeName: hello
-    robotNum: 2
+  - treeName: subHello
+    robotNum: 1000
     parallel: 100
     interval: 1
 
 environments:
-  backend: ws://127.0.0.1:8085/query
+  backend: http://host.docker.internal:8085/query

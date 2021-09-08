@@ -16,6 +16,8 @@ import (
 
 type ClientOption func(client *graphql.SubscriptionClient)
 
+type MessageCallback func(tick *core.Tick, message *json.RawMessage, err error) error
+
 type MessageHandler func(message *json.RawMessage, err error) error
 
 func WithLog(log func(args ...interface{})) ClientOption {
@@ -108,7 +110,7 @@ func (g *GqlSubscriber) OnOpen(tick *core.Tick) {
 	g.actorID = job.statPID
 }
 
-func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, handler MessageHandler) MessageHandler {
+func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick *core.Tick, callback MessageCallback) MessageHandler {
 	return func(message *json.RawMessage, err error) error {
 		var rawMsg Message
 		errj := json.Unmarshal(*message, &rawMsg)
@@ -118,8 +120,8 @@ func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, handler MessageHan
 		var outcome transfer.Outcome
 		start := time.Unix(rawMsg.Extensions.Debug.SendTime, 0).Unix()
 		outcome.Consume = time.Now().Unix() - start
-		if handler != nil {
-			err = handler(rawMsg.Data, err)
+		if callback != nil {
+			err = callback(tick, rawMsg.Data, err)
 		}
 		outcome.Class = transfer.CLASS_EVENT
 		outcome.Name = name
@@ -133,11 +135,11 @@ func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, handler MessageHan
 	}
 }
 
-func NewGqlSubscriber(name string, query interface{}, variables map[string]interface{}, handler MessageHandler) *GqlSubscriber {
+func NewGqlSubscriber(name string, query interface{}, variables map[string]interface{}, callback MessageCallback) *GqlSubscriber {
 	subscriber := &GqlSubscriber{}
-	subscriber.SubTopic = func(client interface{}) error {
+	subscriber.SubTopic = func(tick *core.Tick, client interface{}) error {
 		subClient := client.(*graphql.SubscriptionClient)
-		wrapHandler := subscriber.GqlSubscriberWrapHandler(name, handler)
+		wrapHandler := subscriber.GqlSubscriberWrapHandler(name, tick, callback)
 		_, err := subClient.NamedSubscribe(name, query, variables, wrapHandler)
 		return err
 	}

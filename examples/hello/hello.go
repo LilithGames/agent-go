@@ -22,7 +22,6 @@ func HelloHandlers() agent.Handlers {
 }
 
 func HelloA(tick *core.Tick) (behavior3go.Status, error) {
-	time.Sleep(time.Millisecond * time.Duration(rand.Intn(10)))
 	return behavior3go.SUCCESS, nil
 }
 
@@ -32,7 +31,6 @@ func HelloB(tick *core.Tick) (behavior3go.Status, error) {
 }
 
 func HelloC(tick *core.Tick) (behavior3go.Status, error) {
-	time.Sleep(time.Millisecond * time.Duration(rand.Intn(10)))
 	return behavior3go.SUCCESS, nil
 }
 
@@ -42,13 +40,11 @@ func HelloD(tick *core.Tick) (behavior3go.Status, error) {
 }
 
 func HelloE(tick *core.Tick) (behavior3go.Status, error) {
-	time.Sleep(time.Millisecond * time.Duration(rand.Intn(10)))
 	return behavior3go.SUCCESS, nil
 }
 
-
 func NewSubscription() core.IBaseNode {
-	subscription := agent.NewGqlSubscription(agent.WithLog(log.Println))
+	subscription := agent.NewGqlSubscription()
 	return subscription
 }
 
@@ -62,7 +58,7 @@ func NewSubscriber() core.IBaseNode {
 	variables := map[string]interface{}{
 		"roomName": graphql.String("#gophers"),
 	}
-	handler := func(message *json.RawMessage, err error) error {
+	handler := func(tick *core.Tick, message *json.RawMessage, err error) error {
 		if err != nil {
 			log.Println(err)
 		}

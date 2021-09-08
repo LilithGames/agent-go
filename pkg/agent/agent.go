@@ -5,6 +5,7 @@ import (
 	"github.com/LilithGames/agent-go/tools/metric"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
@@ -36,10 +37,10 @@ func NewAgent(engine *Engine, opts ...*AgentOpt) *Agent {
 }
 
 func (a *Agent) Start() {
+	go a.startMetricServer()
 	if a.endpoint == "" {
 		a.startDefaultAgent()
 	} else {
-		go a.startMetricServer()
 		a.startClusterAgent()
 	}
 }
@@ -74,7 +75,14 @@ func (a *Agent) dialMaster() *grpc.ClientConn {
 
 func (a *Agent) newOutgoingContext() context.Context {
 	agentID := xid.New().String()
-	data := map[string]string{"agentID": agentID, "ID": os.Getenv("ID")}
+	var rc int32
+	for _, plan := range a.engine.plans {
+		if plan.RobotNum > rc {
+			rc = plan.RobotNum
+		}
+	}
+	robotNum := strconv.Itoa(int(rc))
+	data := map[string]string{"agentID": agentID, "ID": os.Getenv("ID"), "robotNum": robotNum}
 	return metadata.NewOutgoingContext(context.Background(), metadata.New(data))
 }
 

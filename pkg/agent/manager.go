@@ -11,7 +11,9 @@ import (
 	"github.com/magicsea/behavior3go/loader"
 	"go.uber.org/zap"
 	"io"
+	"math"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -140,20 +142,35 @@ func (m *manager) startExecutor(executor *executor) {
 	wg.Add(robotNum)
 	defer wg.Wait()
 
+	parallel := m.getParallel()
+	ticker := time.NewTicker(time.Second)
 	for i := 0; i < int(executor.plan.RobotNum); i++ {
 		job := newJob().
 			withCancelCtx(m.stream.ctx).
 			withWaitGroup(wg).
 			withStatPID(actuaryID).
 			withBeTree(executor.treeCreator())
-		con := int(executor.plan.Parallel)
-		interval := time.Second * time.Duration(executor.plan.Interval)
-		if con != 0 && i%con == 0 && i/con > 0 {
-			time.Sleep(interval)
+		if i % parallel == 0 && i / parallel > 0 {
+			<- ticker.C
 		}
 		props := actor.PropsFromProducer(newRobot)
 		robotID := system.Root.Spawn(props)
 		system.Root.Send(robotID, job)
 		system.Root.Poison(robotID)
 	}
+}
+
+func (m *manager) getParallel() int {
+	var rs int
+	pe := os.Getenv("parallel")
+	if pe != "" {
+		rs, _ = strconv.Atoi(pe)
+		return rs
+	}
+	for _, plan := range m.engine.plans {
+		if int(plan.Parallel) > rs {
+			rs = int(plan.Parallel)
+		}
+ 	}
+ 	return math.MaxInt16
 }

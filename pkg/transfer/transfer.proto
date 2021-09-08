@@ -8,6 +8,7 @@ enum ACTION {
   REPORT_DATA = 2;
   FINISH_PLAN = 3;
   START_CIRCLE = 4;
+  REPORT_PARALLEL = 5;
 }
 
 message Mail {
@@ -25,7 +26,8 @@ message Plan {
 message Event {
   string image = 1;
   int32 agentNum = 2;
-  map<string, string> environments = 3;
+  int32 parallel = 3;
+  map<string, string> environments = 4;
 }
 
 message EventReply {
