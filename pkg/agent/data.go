@@ -167,11 +167,10 @@ func pushLocalData(planName string, report *transfer.Report) error {
 	return nil
 }
 
-func echoLocalData(planName string, view *ViewOpt) error {
+func echoLocalData(planName string, view *ViewOpt) {
 	printQuantitySlice(planName + ":H", quantities.Handler, view)
 	printQuantitySlice(planName + ":E", quantities.Event, view)
 	printErrorMessage(planName + ":H", quantities.Handler, view)
 	printErrorMessage(planName + ":E", quantities.Handler, view)
 	quantities = newQuantities()
-	return nil
 }

@@ -2,7 +2,7 @@ plans:
 
   - treeName: subHello
     robotNum: 1000
-    parallel: 100
+    parallel: 10
     interval: 1
 
 environments:

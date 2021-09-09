@@ -4,7 +4,7 @@
   "data": {
     "version": "0.3.0",
     "scope": "project",
-    "selectedTree": "e933515f-3b2e-470f-9c6b-da54c2ca18c9",
+    "selectedTree": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
     "trees": [
       {
         "version": "0.3.0",
@@ -12,135 +12,94 @@
         "id": "e933515f-3b2e-470f-9c6b-da54c2ca18c9",
         "title": "hello",
         "description": "",
-        "root": "5f187be4-fed2-4d74-85f6-8b8f681bd10a",
+        "root": "0eb90abe-c420-4a7b-af0a-121bc4b3fd14",
         "properties": {},
         "nodes": {
-          "5f187be4-fed2-4d74-85f6-8b8f681bd10a": {
-            "id": "5f187be4-fed2-4d74-85f6-8b8f681bd10a",
-            "name": "MemSequence",
-            "category": "composite",
-            "title": "MemSequence",
-            "description": "",
-            "properties": {},
-            "display": {
-              "x": -396,
-              "y": -12
-            },
-            "children": [
-              "c3970d11-4ded-40d7-a0a3-696d7b46b676"
-            ]
-          },
-          "c3970d11-4ded-40d7-a0a3-696d7b46b676": {
-            "id": "c3970d11-4ded-40d7-a0a3-696d7b46b676",
-            "name": "Repeater",
-            "category": "decorator",
-            "title": "Repeat <maxLoop>x",
-            "description": "",
-            "properties": {
-              "maxLoop": 1
-            },
-            "display": {
-              "x": -228,
-              "y": -12
-            },
-            "child": "859b39a0-c7c6-4f92-99b2-d4e98a4a780d"
-          },
-          "859b39a0-c7c6-4f92-99b2-d4e98a4a780d": {
-            "id": "859b39a0-c7c6-4f92-99b2-d4e98a4a780d",
+          "0eb90abe-c420-4a7b-af0a-121bc4b3fd14": {
+            "id": "0eb90abe-c420-4a7b-af0a-121bc4b3fd14",
             "name": "Parallel",
             "category": "composite",
             "title": "Parallel",
             "description": "",
             "properties": {},
             "display": {
-              "x": -72,
+              "x": -312,
               "y": -12
             },
             "children": [
-              "730b6bad-df40-45ad-81d3-597f7dcbb4a9",
-              "07d54a4d-66e0-461a-80d6-3410aa3510cc",
-              "7763f7b2-4fe9-4c0c-a7ff-68d7eda4f5ef"
+              "b0cea38a-10c2-442b-8170-7935089cd9a1",
+              "7676ee90-9355-4586-8677-ba022c10e217"
             ]
           },
-          "730b6bad-df40-45ad-81d3-597f7dcbb4a9": {
-            "id": "730b6bad-df40-45ad-81d3-597f7dcbb4a9",
+          "b0cea38a-10c2-442b-8170-7935089cd9a1": {
+            "id": "b0cea38a-10c2-442b-8170-7935089cd9a1",
             "name": "Repeater",
             "category": "decorator",
             "title": "Repeat <maxLoop>x",
             "description": "",
             "properties": {
-              "maxLoop": 100
+              "maxLoop": 1000
             },
             "display": {
-              "x": 156,
+              "x": -132,
               "y": -132
             },
-            "child": "9d9d0ffa-0384-41dc-9830-a8798271e68e"
+            "child": "99c96e47-2f83-4e9d-8e7e-34258f28576a"
           },
-          "56555abf-099a-4ae2-92c0-8ebb90a2fa9a": {
-            "id": "56555abf-099a-4ae2-92c0-8ebb90a2fa9a",
-            "name": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
-            "category": "tree",
-            "title": "subHello",
+          "99c96e47-2f83-4e9d-8e7e-34258f28576a": {
+            "id": "99c96e47-2f83-4e9d-8e7e-34258f28576a",
+            "name": "Sequence",
+            "category": "composite",
+            "title": "Sequence",
             "description": "",
             "properties": {},
             "display": {
-              "x": 408,
-              "y": -12
-            }
+              "x": 48,
+              "y": -132
+            },
+            "children": [
+              "3edaf62c-a7b0-4ce6-a1e6-56e1f7a1a6e0"
+            ]
           },
-          "07d54a4d-66e0-461a-80d6-3410aa3510cc": {
-            "id": "07d54a4d-66e0-461a-80d6-3410aa3510cc",
-            "name": "Repeater",
-            "category": "decorator",
-            "title": "Repeat <maxLoop>x",
+          "3edaf62c-a7b0-4ce6-a1e6-56e1f7a1a6e0": {
+            "id": "3edaf62c-a7b0-4ce6-a1e6-56e1f7a1a6e0",
+            "name": "Wait",
+            "category": "action",
+            "title": "Wait <milliseconds>ms",
             "description": "",
             "properties": {
-              "maxLoop": 10
+              "milliseconds": 1000
             },
             "display": {
-              "x": 156,
-              "y": -12
-            },
-            "child": "56555abf-099a-4ae2-92c0-8ebb90a2fa9a"
-          },
-          "9d9d0ffa-0384-41dc-9830-a8798271e68e": {
-            "id": "9d9d0ffa-0384-41dc-9830-a8798271e68e",
-            "name": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
-            "category": "tree",
-            "title": "subHello",
-            "description": "",
-            "properties": {},
-            "display": {
-              "x": 396,
-              "y": -132
+              "x": 264,
+              "y": -228
             }
           },
-          "7763f7b2-4fe9-4c0c-a7ff-68d7eda4f5ef": {
-            "id": "7763f7b2-4fe9-4c0c-a7ff-68d7eda4f5ef",
+          "7676ee90-9355-4586-8677-ba022c10e217": {
+            "id": "7676ee90-9355-4586-8677-ba022c10e217",
             "name": "TestSubscription",
             "category": "composite",
             "title": "TestSubscription",
             "description": "",
             "properties": {},
             "display": {
-              "x": 168,
-              "y": 144
+              "x": -120,
+              "y": 96
             },
             "children": [
-              "3ce1e4cf-4eec-474a-8e29-cf8ab14bcddd"
+              "c94c70e4-e623-49b3-9305-4eb4640304b3"
             ]
           },
-          "3ce1e4cf-4eec-474a-8e29-cf8ab14bcddd": {
-            "id": "3ce1e4cf-4eec-474a-8e29-cf8ab14bcddd",
+          "c94c70e4-e623-49b3-9305-4eb4640304b3": {
+            "id": "c94c70e4-e623-49b3-9305-4eb4640304b3",
             "name": "TestSubscriber",
             "category": "action",
             "title": "TestSubscriber",
             "description": "",
             "properties": {},
             "display": {
-              "x": 420,
-              "y": 144
+              "x": 168,
+              "y": 96
             }
           }
         },

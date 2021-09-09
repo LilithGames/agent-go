@@ -52,9 +52,9 @@ func (r *reporter) appendOutcome(outcome *transfer.Outcome) {
 
 func (r *reporter) stopReport() {
 	r.sendStatMail()
-	err := r.stream.sendFinish(r.planName)
+	err := r.stream.finishPlan(r.planName)
 	if err != nil {
-		log.Panic("receive error where send finish", zap.Error(err))
+		log.Error("receive error where send finish", zap.Error(err))
 	}
 }
 
@@ -65,6 +65,6 @@ func (r *reporter) sendStatMail() {
 	report := &transfer.Report{Outcomes: r.outcomes, EventNum: r.eventNum}
 	err := r.stream.sendReport(r.planName, report)
 	if err != nil {
-		log.Panic("receive error where send stat", zap.Error(err))
+		log.Error("receive error where send stat", zap.Error(err))
 	}
 }

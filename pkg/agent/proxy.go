@@ -11,21 +11,22 @@ import (
 )
 
 type proxyStream struct {
+	ctx context.Context
 	grpc.ClientStream
 	index      int
 	count      int
 	circle     bool
 	id         string
-	ctx        context.Context
-	cancel     context.CancelFunc
 	client     transfer.Courier_DeliverMailClient
 	viewOpt    *ViewOpt
 }
 
 func newProxyStream(client transfer.Courier_DeliverMailClient, viewOpts ...*ViewOpt) *proxyStream {
-	proxy := &proxyStream{client: client, id: os.Getenv("ID"), viewOpt: mergeViewOpt(viewOpts...)}
-	proxy.ctx, proxy.cancel = context.WithCancel(context.Background())
-	return proxy
+	return &proxyStream{client: client, id: os.Getenv("ID"), viewOpt: mergeViewOpt(viewOpts...)}
+}
+
+func (s *proxyStream) withContext(ctx context.Context) {
+	s.ctx = ctx
 }
 
 func (s *proxyStream) setPlanCount(count int, circle bool) {
@@ -34,29 +35,25 @@ func (s *proxyStream) setPlanCount(count int, circle bool) {
 	s.circle = circle
 }
 
-func (s *proxyStream) sendFinish(planName string) error {
-	defer func() {
+func (s *proxyStream) finishPlan(planName string) error {
+	if s.client == nil {
+		echoLocalData(planName, s.viewOpt)
+	}
+	select {
+	case <- s.ctx.Done():
+		return nil
+	default:
 		s.index++
-		if s.index >= s.count && !s.circle {
-			s.cancel()
-		}
+	}
+	if s.index >= s.count {
 		if s.circle {
 			s.index %= s.count
-		}
-	}()
-	if s.client == nil {
-		return echoLocalData(planName, s.viewOpt)
-	}
-	planID := s.formatPlanID(planName)
-	mail := &transfer.Mail{Action: transfer.ACTION_FINISH_PLAN, Content: []byte(planID)}
-	err := s.client.Send(mail)
-	if err != nil {
-		return fmt.Errorf("send finish message: %w", err)
-	}
-	if s.index >= s.count - 1 && !s.circle {
-		err = s.client.CloseSend()
-		if err != nil {
-			return fmt.Errorf("send close message: %w", err)
+		} else if s.client != nil{
+			mail := &transfer.Mail{Action: transfer.ACTION_FINISH_PLAN, Content: []byte(s.id)}
+			err := s.client.Send(mail)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -72,9 +69,14 @@ func (s *proxyStream) sendReport(planName string, report *transfer.Report) error
 		return fmt.Errorf("proto marshal data: %w", err)
 	}
 	mail := &transfer.Mail{Action: transfer.ACTION_REPORT_DATA, Content: content}
-	err = s.client.Send(mail)
-	if err != nil {
-		return fmt.Errorf("send data message: %w", err)
+	select {
+	case <- s.ctx.Done():
+		return nil
+	default:
+		err = s.client.Send(mail)
+		if err != nil {
+			return fmt.Errorf("send data message: %w", err)
+		}
 	}
 	return nil
 }

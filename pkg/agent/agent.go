@@ -47,8 +47,7 @@ func (a *Agent) Start() {
 
 func (a *Agent) startDefaultAgent() {
 	c := newProxyStream(nil, a.opt.getView())
-	newManager(a.engine, c).startReadyService()
-	<-c.ctx.Done()
+	newManager(a.engine, c).startLocalService()
 }
 
 func (a *Agent) startClusterAgent() {
@@ -60,8 +59,7 @@ func (a *Agent) startClusterAgent() {
 		log.Panic("request grpc courier error", zap.Error(err))
 	}
 	var c = newProxyStream(client, a.opt.getView())
-	newManager(a.engine, c).startService()
-	<-c.ctx.Done()
+	newManager(a.engine, c).startClusterService()
 }
 
 func (a *Agent) dialMaster() *grpc.ClientConn {

@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -21,37 +22,50 @@ import (
 type manager struct {
 	engine *Engine
 	stream *proxyStream
+	ctx context.Context
+	cancel context.CancelFunc
 }
 
 func newManager(engine *Engine, stream *proxyStream) *manager {
+	ctx, cancel := context.WithCancel(context.Background())
+	stream.withContext(ctx)
 	return &manager{
 		engine: engine,
 		stream: stream,
+		ctx: ctx,
+		cancel: cancel,
 	}
 }
 
-func (m *manager) startService() {
-	var mail *transfer.Mail
-	var err error
+func (m *manager) startClusterService() {
+	mailbox := make(chan *transfer.Mail)
+	go m.receiveMail(mailbox)
 	for {
-		select {
-		case <-m.stream.ctx.Done():
-			return
-		default:
-			mail, err = m.stream.Recv()
-		}
-		if errors.Is(err, io.EOF) {
-			log.Info("receive stop command...")
+		mail := <- mailbox
+		if mail == nil {
 			return
 		}
-		if err != nil {
-			log.Error("receive error from master", zap.Error(err))
-			return
-		}
-		err = m.reviewMail(mail)
+		err := m.reviewMail(mail)
 		if err != nil {
 			log.Error("internal error in agent", zap.Error(err))
 			return
+		}
+	}
+}
+
+func (m *manager) receiveMail(mailbox chan *transfer.Mail) {
+	for  {
+		select {
+		case <-m.ctx.Done():
+			close(mailbox)
+			return
+		default:
+			mail, err := m.stream.Recv()
+			if errors.Is(err, io.EOF) {
+				m.cancel()
+				break
+			}
+			mailbox <- mail
 		}
 	}
 }
@@ -74,7 +88,7 @@ func (m *manager) setEngineEnvs(content []byte) error {
 func (m *manager) reviewMail(mail *transfer.Mail) error {
 	switch mail.Action {
 	case transfer.ACTION_START_AGENT:
-		return m.startAgentEngine(mail.Content)
+		return m.startAgentOnceEngine(mail.Content)
 	case transfer.ACTION_START_CIRCLE:
 		return m.startAgentCircleEngine(mail.Content)
 	default:
@@ -91,18 +105,44 @@ func (m *manager) startAgentCircleEngine(content []byte) error {
 	executors := m.buildExecutors()
 	for  {
 		for _, exec := range executors {
-			m.startExecutor(exec)
+			select {
+			case <- m.ctx.Done():
+				return nil
+			default:
+				m.startExecutor(exec)
+			}
 		}
 	}
 }
 
-func (m *manager) startAgentEngine(content []byte) error {
+func (m *manager) startAgentOnceEngine(content []byte) error {
 	err := m.setEngineEnvs(content)
 	if err != nil {
 		return fmt.Errorf("set envs error: %w", err)
 	}
-	m.startReadyService()
+	m.stream.setPlanCount(len(m.engine.plans), false)
+	m.startAgentOnceExecutors()
 	return nil
+}
+
+func (m *manager) startLocalService() {
+	m.stream.setPlanCount(len(m.engine.plans), false)
+	for k, v := range m.engine.envs {
+		_ = os.Setenv(k, v)
+	}
+	m.startAgentOnceExecutors()
+}
+
+func (m *manager) startAgentOnceExecutors() {
+	executors := m.buildExecutors()
+	for _, exec := range executors{
+		select {
+		case <- m.ctx.Done():
+			return
+		default:
+			m.startExecutor(exec)
+		}
+	}
 }
 
 func (m *manager) buildExecutors() []*executor {
@@ -120,33 +160,20 @@ func (m *manager) buildExecutors() []*executor {
 	return executors
 }
 
-func (m *manager) startReadyService() {
-	m.stream.setPlanCount(len(m.engine.plans), false)
-	for k, v := range m.engine.envs {
-		_ = os.Setenv(k, v)
-	}
-	executors := m.buildExecutors()
-	for _, exec := range executors{
-		m.startExecutor(exec)
-	}
-}
-
 func (m *manager) startExecutor(executor *executor) {
 	system := actor.NewActorSystem()
 	props := actor.PropsFromProducer(reporterFactory(executor.plan.TreeName, m.stream))
 	actuaryID := system.Root.Spawn(props)
-	defer system.Root.Poison(actuaryID)
 
 	robotNum := int(executor.plan.RobotNum)
 	wg := &sync.WaitGroup{}
 	wg.Add(robotNum)
-	defer wg.Wait()
 
 	parallel := m.getParallel()
 	ticker := time.NewTicker(time.Second)
 	for i := 0; i < int(executor.plan.RobotNum); i++ {
 		job := newJob().
-			withCancelCtx(m.stream.ctx).
+			withCancelCtx(m.ctx).
 			withWaitGroup(wg).
 			withStatPID(actuaryID).
 			withBeTree(executor.treeCreator())
@@ -157,6 +184,11 @@ func (m *manager) startExecutor(executor *executor) {
 		robotID := system.Root.Spawn(props)
 		system.Root.Send(robotID, job)
 		system.Root.Poison(robotID)
+	}
+	wg.Wait()
+	err := system.Root.PoisonFuture(actuaryID).Wait()
+	if err != nil {
+		log.Error("stop actuary error", zap.Error(err))
 	}
 }
 
