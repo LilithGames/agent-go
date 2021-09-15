@@ -112,10 +112,15 @@ func (g *GqlSubscriber) OnOpen(tick *core.Tick) {
 
 func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick *core.Tick, callback MessageCallback) MessageHandler {
 	return func(message *json.RawMessage, err error) error {
+		if err != nil {
+			log.Error("receive event data error", zap.Error(err))
+			return err
+		}
 		var rawMsg Message
-		errj := json.Unmarshal(*message, &rawMsg)
-		if errj != nil {
-			log.Panic("unmarshal message error", zap.Error(errj))
+		err = json.Unmarshal(*message, &rawMsg)
+		if err != nil {
+			log.Error("unmarshal message error", zap.Error(err))
+			return err
 		}
 		var outcome transfer.Outcome
 		start := time.Unix(rawMsg.Extensions.Debug.SendTime, 0).Unix()
