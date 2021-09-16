@@ -108,5 +108,5 @@ func NewSubscriber() core.IBaseNode {
 		}
 		return err
 	}
-	return agent.NewGqlSubscriber("test", query, variables, handler)
+	return agent.NewGqlSubscriber("test", query).WithVariables(variables).WithCallback(handler)
 }
