@@ -14,7 +14,7 @@ import (
 
 var quantities *transfer.Quantities
 
-func init()  {
+func init() {
 	quantities = newQuantities()
 }
 
@@ -168,9 +168,9 @@ func pushLocalData(planName string, report *transfer.Report) error {
 }
 
 func echoLocalData(planName string, view *ViewOpt) {
-	printQuantitySlice(planName + ":H", quantities.Handler, view)
-	printQuantitySlice(planName + ":E", quantities.Event, view)
-	printErrorMessage(planName + ":H", quantities.Handler, view)
-	printErrorMessage(planName + ":E", quantities.Handler, view)
+	printQuantitySlice(planName+":H", quantities.Handler, view)
+	printQuantitySlice(planName+":E", quantities.Event, view)
+	printErrorMessage(planName+":H", quantities.Handler, view)
+	printErrorMessage(planName+":E", quantities.Handler, view)
 	quantities = newQuantities()
 }

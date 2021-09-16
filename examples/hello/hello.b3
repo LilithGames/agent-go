@@ -4,7 +4,7 @@
   "data": {
     "version": "0.3.0",
     "scope": "project",
-    "selectedTree": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
+    "selectedTree": "8cacc959-0f85-4770-862f-56ef34454b73",
     "trees": [
       {
         "version": "0.3.0",
@@ -241,6 +241,122 @@
           "x": -444,
           "y": -36
         }
+      },
+      {
+        "version": "0.3.0",
+        "scope": "tree",
+        "id": "5daf5bdf-0bea-45b6-bcae-0a5fd0e66181",
+        "title": "friend",
+        "description": "",
+        "root": "e65d2d1c-b2a4-43cd-adf7-a4a344182798",
+        "properties": {},
+        "nodes": {
+          "97fbc4b9-37e3-45fc-a38f-da8998eb086f": {
+            "id": "97fbc4b9-37e3-45fc-a38f-da8998eb086f",
+            "name": "newUser",
+            "category": "action",
+            "title": "newUser",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -72,
+              "y": -180
+            }
+          },
+          "41723b01-a2d8-4118-835d-97ca98bd29cc": {
+            "id": "41723b01-a2d8-4118-835d-97ca98bd29cc",
+            "name": "addFriend",
+            "category": "action",
+            "title": "addFriend",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -72,
+              "y": -72
+            }
+          },
+          "e65d2d1c-b2a4-43cd-adf7-a4a344182798": {
+            "id": "e65d2d1c-b2a4-43cd-adf7-a4a344182798",
+            "name": "MemSequence",
+            "category": "composite",
+            "title": "MemSequence",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -324,
+              "y": -72
+            },
+            "children": [
+              "97fbc4b9-37e3-45fc-a38f-da8998eb086f",
+              "41723b01-a2d8-4118-835d-97ca98bd29cc"
+            ]
+          }
+        },
+        "display": {
+          "camera_x": 960,
+          "camera_y": 508.5,
+          "camera_z": 1,
+          "x": -504,
+          "y": -72
+        }
+      },
+      {
+        "version": "0.3.0",
+        "scope": "tree",
+        "id": "8cacc959-0f85-4770-862f-56ef34454b73",
+        "title": "team",
+        "description": "",
+        "root": "3a1de50b-0ada-4509-8072-7c6e8fb35c1e",
+        "properties": {},
+        "nodes": {
+          "3a1de50b-0ada-4509-8072-7c6e8fb35c1e": {
+            "id": "3a1de50b-0ada-4509-8072-7c6e8fb35c1e",
+            "name": "MemSequence",
+            "category": "composite",
+            "title": "MemSequence",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -348,
+              "y": -108
+            },
+            "children": [
+              "bc210703-ef95-4a71-8765-c56ea88ee633",
+              "797b8612-84fe-45e5-87e8-53069329c97e"
+            ]
+          },
+          "bc210703-ef95-4a71-8765-c56ea88ee633": {
+            "id": "bc210703-ef95-4a71-8765-c56ea88ee633",
+            "name": "newUser",
+            "category": "action",
+            "title": "newUser",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -132,
+              "y": -228
+            }
+          },
+          "797b8612-84fe-45e5-87e8-53069329c97e": {
+            "id": "797b8612-84fe-45e5-87e8-53069329c97e",
+            "name": "buildTeam",
+            "category": "action",
+            "title": "buildTeam",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -132,
+              "y": 24
+            }
+          }
+        },
+        "display": {
+          "camera_x": 960,
+          "camera_y": 508.5,
+          "camera_z": 1,
+          "x": -492,
+          "y": -108
+        }
       }
     ],
     "custom_nodes": [
@@ -340,6 +456,36 @@
         "name": "TestSubscriber",
         "category": "action",
         "title": "TestSubscriber",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "newUser",
+        "category": "action",
+        "title": "newUser",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "addFriend",
+        "category": "action",
+        "title": "addFriend",
+        "description": null,
+        "properties": {},
+        "parent": null
+      },
+      {
+        "version": "0.3.0",
+        "scope": "node",
+        "name": "buildTeam",
+        "category": "action",
+        "title": "buildTeam",
         "description": null,
         "properties": {},
         "parent": null

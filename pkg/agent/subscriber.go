@@ -16,7 +16,7 @@ import (
 
 type ClientOption func(client *graphql.SubscriptionClient)
 
-type MessageCallback func(tick *core.Tick, message *json.RawMessage, err error) error
+type MessageCallback func(tick Ticker, message *json.RawMessage, err error) error
 
 type MessageHandler func(message *json.RawMessage, err error) error
 
@@ -61,8 +61,8 @@ type GqlSubscription struct {
 	token string
 }
 
-func (g *GqlSubscription) OnOpen(tick *core.Tick) {
-	rawToken := tick.Blackboard.GetMem("token")
+func (g *GqlSubscription) OnOpen(tick core.Ticker) {
+	rawToken := tick.Blackboard().GetMem("token")
 	if rawToken != nil {
 		g.token = rawToken.(string)
 	}
@@ -81,7 +81,7 @@ func NewGqlSubscription(options ...ClientOption) *GqlSubscription {
 				"Authorization": subscription.token,
 			})
 		}
-		for _, option :=  range options {
+		for _, option := range options {
 			option(client)
 		}
 		return client
@@ -91,26 +91,29 @@ func NewGqlSubscription(options ...ClientOption) *GqlSubscription {
 
 type GqlSubscriber struct {
 	actions.Subscriber
-	actorID *actor.PID
-	actorCtx actor.Context
+	actorID   *actor.PID
+	actorCtx  actor.Context
+	variables map[string]interface{}
+	callback  MessageCallback
+	reply     interface{}
 }
 
 type Message struct {
-	Data *json.RawMessage `json:"data"`
-	Extensions struct{
-		Debug struct{
+	Data       *json.RawMessage `json:"data"`
+	Extensions struct {
+		Debug struct {
 			SendTime int64 `json:"send_time"`
 		} `json:"debug"`
 	} `json:"extensions"`
 }
 
-func (g *GqlSubscriber) OnOpen(tick *core.Tick) {
-	g.actorCtx = tick.Blackboard.GetMem("actorCtx").(actor.Context)
-	job := tick.GetTarget().(*job)
-	g.actorID = job.statPID
+func (g *GqlSubscriber) OnOpen(ticker core.Ticker) {
+	tick := ticker.(*Tick)
+	g.actorCtx = tick.Blackboard().GetMem("actorCtx").(actor.Context)
+	g.actorID = tick.stat()
 }
 
-func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick *core.Tick, callback MessageCallback) MessageHandler {
+func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick Ticker) MessageHandler {
 	return func(message *json.RawMessage, err error) error {
 		if err != nil {
 			log.Error("receive event data error", zap.Error(err))
@@ -122,11 +125,18 @@ func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick *core.Tick, c
 			log.Error("unmarshal message error", zap.Error(err))
 			return err
 		}
+		if g.reply != nil {
+			err = json.Unmarshal(*rawMsg.Data, g.reply)
+			if err != nil {
+				log.Error("unmarshal message error", zap.Error(err))
+				return err
+			}
+		}
 		var outcome transfer.Outcome
-		start := time.Unix(rawMsg.Extensions.Debug.SendTime, 0).Unix()
-		outcome.Consume = time.Now().Unix() - start
-		if callback != nil {
-			err = callback(tick, rawMsg.Data, err)
+		start := time.Unix(rawMsg.Extensions.Debug.SendTime, 0).UnixNano()
+		outcome.Consume = time.Now().UnixNano() - start
+		if g.callback != nil {
+			err = g.callback(tick, rawMsg.Data, err)
 		}
 		outcome.Class = transfer.CLASS_EVENT
 		outcome.Name = name
@@ -140,15 +150,29 @@ func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick *core.Tick, c
 	}
 }
 
-func NewGqlSubscriber(name string, query interface{}, variables map[string]interface{}, callback MessageCallback) *GqlSubscriber {
+func (g *GqlSubscriber) WithVariables(variables map[string]interface{}) *GqlSubscriber {
+	g.variables = variables
+	return g
+}
+
+func (g *GqlSubscriber) WithCallback(callback MessageCallback) *GqlSubscriber {
+	g.callback = callback
+	return g
+}
+
+func (g *GqlSubscriber) WithReply(reply interface{}) *GqlSubscriber {
+	g.reply = reply
+	return g
+}
+
+func NewGqlSubscriber(name string, query interface{}) *GqlSubscriber {
 	subscriber := &GqlSubscriber{}
-	subscriber.SubTopic = func(tick *core.Tick, client interface{}) error {
+	subscriber.SubTopic = func(ticker core.Ticker, client interface{}) error {
+		tick := ticker.(*Tick)
 		subClient := client.(*graphql.SubscriptionClient)
-		wrapHandler := subscriber.GqlSubscriberWrapHandler(name, tick, callback)
-		_, err := subClient.NamedSubscribe(name, query, variables, wrapHandler)
+		wrapHandler := subscriber.GqlSubscriberWrapHandler(name, tick)
+		_, err := subClient.NamedSubscribe(name, query, subscriber.variables, wrapHandler)
 		return err
 	}
 	return subscriber
 }
-
-

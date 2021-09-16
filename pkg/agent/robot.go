@@ -15,6 +15,7 @@ type job struct {
 	tree      *core.BehaviorTree
 	waitGroup *sync.WaitGroup
 	ctx       context.Context
+	market    *Market
 }
 
 func newJob() *job {
@@ -41,6 +42,11 @@ func (t *job) withStatPID(pid *actor.PID) *job {
 	return t
 }
 
+func (t *job) withMarket(market *Market) *job {
+	t.market = market
+	return t
+}
+
 type robot struct {
 }
 
@@ -59,9 +65,13 @@ func (r *robot) execute(ctx actor.Context, task *job) {
 	outcome := transfer.Outcome{Name: "whole_process"}
 	board := core.NewBlackboard()
 	board.SetMem("actorCtx", ctx)
+	tick := NewTicker()
+	tick.market = task.market
+	tick.ctx = task.ctx
+	tick.statPID = task.statPID
 	var status behavior3go.Status
 	for {
-		status := task.tree.Tick(task, board)
+		status := task.tree.Tick(tick, nil, board)
 		if status != behavior3go.RUNNING {
 			break
 		}

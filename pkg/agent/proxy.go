@@ -13,12 +13,12 @@ import (
 type proxyStream struct {
 	ctx context.Context
 	grpc.ClientStream
-	index      int
-	count      int
-	circle     bool
-	id         string
-	client     transfer.Courier_DeliverMailClient
-	viewOpt    *ViewOpt
+	index   int
+	count   int
+	circle  bool
+	id      string
+	client  transfer.Courier_DeliverMailClient
+	viewOpt *ViewOpt
 }
 
 func newProxyStream(client transfer.Courier_DeliverMailClient, viewOpts ...*ViewOpt) *proxyStream {
@@ -40,7 +40,7 @@ func (s *proxyStream) finishPlan(planName string) error {
 		echoLocalData(planName, s.viewOpt)
 	}
 	select {
-	case <- s.ctx.Done():
+	case <-s.ctx.Done():
 		return nil
 	default:
 		s.index++
@@ -48,7 +48,7 @@ func (s *proxyStream) finishPlan(planName string) error {
 	if s.index >= s.count {
 		if s.circle {
 			s.index %= s.count
-		} else if s.client != nil{
+		} else if s.client != nil {
 			mail := &transfer.Mail{Action: transfer.ACTION_FINISH_PLAN, Content: []byte(s.id)}
 			err := s.client.Send(mail)
 			if err != nil {
@@ -70,7 +70,7 @@ func (s *proxyStream) sendReport(planName string, report *transfer.Report) error
 	}
 	mail := &transfer.Mail{Action: transfer.ACTION_REPORT_DATA, Content: content}
 	select {
-	case <- s.ctx.Done():
+	case <-s.ctx.Done():
 		return nil
 	default:
 		err = s.client.Send(mail)

@@ -13,7 +13,9 @@ import (
 	"time"
 )
 
-type Handler func(tick *core.Tick) (behavior3go.Status, error)
+type Handler func(ticker Ticker) (behavior3go.Status, error)
+
+type Handlers map[string]Handler
 
 type Action struct {
 	core.Action
@@ -24,11 +26,11 @@ func (n *Action) Initialize(params *config.BTNodeCfg) {
 	n.Action.Initialize(params)
 }
 
-func (n *Action) OnTick(tick *core.Tick) behavior3go.Status {
+func (n *Action) OnTick(ticker core.Ticker) behavior3go.Status {
+	tick := ticker.(*Tick)
 	defer n.recoverPanic()
-	time.Sleep(time.Millisecond * time.Duration(rand.Intn(100) + 10))
+	time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)+10))
 	name := n.GetName()
-	job := tick.GetTarget().(*job)
 	var outcome transfer.Outcome
 	outcome.Class = transfer.CLASS_HANDLER
 	start := time.Now()
@@ -44,16 +46,16 @@ func (n *Action) OnTick(tick *core.Tick) behavior3go.Status {
 	outcome.Consume = time.Since(start).Nanoseconds()
 
 	beginKey := "begin:" + name
-	begin := tick.Blackboard.GetMem(beginKey)
+	begin := tick.Blackboard().GetMem(beginKey)
 	if begin != nil && status != behavior3go.RUNNING {
 		outcome.Consume = time.Since(begin.(time.Time)).Nanoseconds()
 	}
 	if begin == nil && status == behavior3go.RUNNING {
-		tick.Blackboard.SetMem(beginKey, start)
+		tick.Blackboard().SetMem(beginKey, start)
 	}
-	actorCtx := tick.Blackboard.GetMem("actorCtx").(actor.Context)
-	actorCtx.Send(job.statPID, &outcome)
-	return n.currentStatus(job.ctx, status)
+	actorCtx := tick.Blackboard().GetMem("actorCtx").(actor.Context)
+	actorCtx.Send(tick.stat(), &outcome)
+	return n.currentStatus(tick.context(), status)
 }
 
 func (n *Action) currentStatus(ctx context.Context, status behavior3go.Status) behavior3go.Status {

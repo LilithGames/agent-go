@@ -37,10 +37,10 @@ func NewAgent(engine *Engine, opts ...*AgentOpt) *Agent {
 }
 
 func (a *Agent) Start() {
-	go a.startMetricServer()
 	if a.endpoint == "" {
 		a.startDefaultAgent()
 	} else {
+		go a.startMetricServer()
 		a.startClusterAgent()
 	}
 }

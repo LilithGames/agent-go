@@ -12,12 +12,10 @@ import (
 	"go.uber.org/zap"
 )
 
-type Handlers map[string]Handler
-
 type Nodes map[string]core.NodeCreator
 
 type Config struct {
-	Plans    []*transfer.Plan
+	Plans        []*transfer.Plan
 	Environments map[string]string
 }
 
@@ -41,7 +39,7 @@ func (c *Config) UnmarshalRawConfig(rawCfg []byte) error {
 }
 
 type executor struct {
-	plan     *transfer.Plan
+	plan        *transfer.Plan
 	treeCreator func() *core.BehaviorTree
 }
 
@@ -52,7 +50,7 @@ type Behavior struct {
 
 func NewBehavior() *Behavior {
 	return &Behavior{
-		trees: map[string]config.BTTreeCfg{},
+		trees:       map[string]config.BTTreeCfg{},
 		registerMap: core.NewRegisterStructMaps(),
 	}
 }
@@ -128,6 +126,6 @@ func (b *Behavior) BuildTestEngine(envs map[string]string, plan *transfer.Plan) 
 
 type Engine struct {
 	*Behavior
-	plans   []*transfer.Plan
-	envs    map[string]string
+	plans []*transfer.Plan
+	envs  map[string]string
 }

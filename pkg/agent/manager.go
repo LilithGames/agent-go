@@ -22,7 +22,7 @@ import (
 type manager struct {
 	engine *Engine
 	stream *proxyStream
-	ctx context.Context
+	ctx    context.Context
 	cancel context.CancelFunc
 }
 
@@ -32,7 +32,7 @@ func newManager(engine *Engine, stream *proxyStream) *manager {
 	return &manager{
 		engine: engine,
 		stream: stream,
-		ctx: ctx,
+		ctx:    ctx,
 		cancel: cancel,
 	}
 }
@@ -41,7 +41,7 @@ func (m *manager) startClusterService() {
 	mailbox := make(chan *transfer.Mail)
 	go m.receiveMail(mailbox)
 	for {
-		mail := <- mailbox
+		mail := <-mailbox
 		if mail == nil {
 			return
 		}
@@ -54,7 +54,7 @@ func (m *manager) startClusterService() {
 }
 
 func (m *manager) receiveMail(mailbox chan *transfer.Mail) {
-	for  {
+	for {
 		select {
 		case <-m.ctx.Done():
 			close(mailbox)
@@ -76,7 +76,7 @@ func (m *manager) setEngineEnvs(content []byte) error {
 	if err != nil {
 		return err
 	}
-	for k, v :=  range envs {
+	for k, v := range envs {
 		err = os.Setenv(k, v)
 		if err != nil {
 			return err
@@ -102,14 +102,14 @@ func (m *manager) startAgentCircleEngine(content []byte) error {
 		return err
 	}
 	m.stream.setPlanCount(len(m.engine.plans), true)
-	executors := m.buildExecutors()
-	for  {
+	executors, market := m.buildExecutors()
+	for {
 		for _, exec := range executors {
 			select {
-			case <- m.ctx.Done():
+			case <-m.ctx.Done():
 				return nil
 			default:
-				m.startExecutor(exec)
+				m.startExecutor(exec, market)
 			}
 		}
 	}
@@ -134,33 +134,38 @@ func (m *manager) startLocalService() {
 }
 
 func (m *manager) startAgentOnceExecutors() {
-	executors := m.buildExecutors()
-	for _, exec := range executors{
+	executors, market := m.buildExecutors()
+	for _, exec := range executors {
 		select {
-		case <- m.ctx.Done():
+		case <-m.ctx.Done():
 			return
 		default:
-			m.startExecutor(exec)
+			m.startExecutor(exec, market)
 		}
 	}
 }
 
-func (m *manager) buildExecutors() []*executor {
+func (m *manager) buildExecutors() ([]*executor, *Market) {
 	executors := make([]*executor, len(m.engine.plans))
+	var mc int32
 	for index, plan := range m.engine.plans {
 		treeCfg := m.engine.trees[plan.TreeName]
 		executor := &executor{
-			plan:     plan,
+			plan: plan,
 			treeCreator: func() *core.BehaviorTree {
 				return loader.CreateBevTreeFromConfig(&treeCfg, m.engine.registerMap)
 			},
 		}
 		executors[index] = executor
+		if plan.RobotNum > mc {
+			mc = plan.RobotNum
+		}
 	}
-	return executors
+	market := newMarket(int(mc))
+	return executors, market
 }
 
-func (m *manager) startExecutor(executor *executor) {
+func (m *manager) startExecutor(executor *executor, market *Market) {
 	system := actor.NewActorSystem()
 	props := actor.PropsFromProducer(reporterFactory(executor.plan.TreeName, m.stream))
 	actuaryID := system.Root.Spawn(props)
@@ -176,9 +181,10 @@ func (m *manager) startExecutor(executor *executor) {
 			withCancelCtx(m.ctx).
 			withWaitGroup(wg).
 			withStatPID(actuaryID).
-			withBeTree(executor.treeCreator())
-		if i % parallel == 0 && i / parallel > 0 {
-			<- ticker.C
+			withBeTree(executor.treeCreator()).
+			withMarket(market)
+		if i%parallel == 0 && i/parallel > 0 {
+			<-ticker.C
 		}
 		props := actor.PropsFromProducer(newRobot)
 		robotID := system.Root.Spawn(props)
@@ -190,6 +196,7 @@ func (m *manager) startExecutor(executor *executor) {
 	if err != nil {
 		log.Error("stop actuary error", zap.Error(err))
 	}
+	market.reset()
 }
 
 func (m *manager) getParallel() int {
@@ -203,6 +210,6 @@ func (m *manager) getParallel() int {
 		if int(plan.Parallel) > rs {
 			rs = int(plan.Parallel)
 		}
- 	}
- 	return math.MaxInt16
+	}
+	return math.MaxInt16
 }
