@@ -77,6 +77,8 @@ type Ticker interface {
 	setContext(ctx context.Context)
 	stat() *actor.PID
 	setStatPID(pid *actor.PID)
+	RecvTime(timestamp time.Duration)
+	SendTime(timestamp time.Duration)
 }
 
 type Tick struct {
@@ -84,6 +86,8 @@ type Tick struct {
 	market  *Market
 	ctx     context.Context
 	statPID *actor.PID
+	recvTime time.Duration
+	sendTime time.Duration
 }
 
 func NewTicker() *Tick {
@@ -114,4 +118,12 @@ func (t *Tick) stat() *actor.PID {
 
 func (t *Tick) setStatPID(pid *actor.PID) {
 	t.statPID = pid
+}
+
+func (t *Tick) RecvTime(timestamp time.Duration) {
+	t.recvTime = timestamp
+}
+
+func (t *Tick) SendTime(timestamp time.Duration) {
+	t.sendTime = timestamp
 }
