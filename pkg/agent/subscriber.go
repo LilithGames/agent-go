@@ -2,7 +2,6 @@ package agent
 
 import (
 	"encoding/json"
-	"github.com/AsynkronIT/protoactor-go/actor"
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/hasura/go-graphql-client"
@@ -92,8 +91,6 @@ func NewGqlSubscription(options ...ClientOption) *GqlSubscription {
 
 type GqlSubscriber struct {
 	actions.Subscriber
-	actorID   *actor.PID
-	actorCtx  actor.Context
 	variables map[string]interface{}
 	callback  MessageCallback
 	reply     interface{}
@@ -107,12 +104,6 @@ type Message struct {
 			RecvTime string `json:"recv_time"`
 		} `json:"debug"`
 	} `json:"extensions"`
-}
-
-func (g *GqlSubscriber) OnOpen(ticker core.Ticker) {
-	tick := ticker.(*Tick)
-	g.actorCtx = tick.Blackboard().GetMem("actorCtx").(actor.Context)
-	g.actorID = tick.stat()
 }
 
 func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick Ticker) MessageHandler {
@@ -151,7 +142,7 @@ func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick Ticker) Messa
 			outcome.Err = err.Error()
 			outcome.Status = transfer.STATUS_ERROR
 		}
-		g.actorCtx.Send(g.actorID, &outcome)
+		tick.actorCtx().Send(tick.stat(), &outcome)
 		return err
 	}
 }
