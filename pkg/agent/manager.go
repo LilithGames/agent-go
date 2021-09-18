@@ -186,10 +186,7 @@ func (m *manager) startExecutor(executor *executor, market *Market) {
 		if i%parallel == 0 && i/parallel > 0 {
 			<-ticker.C
 		}
-		props := actor.PropsFromProducer(newRobot)
-		robotID := system.Root.Spawn(props)
-		system.Root.Send(robotID, job)
-		system.Root.Poison(robotID)
+		go newRobot(job).execute(system.Root)
 	}
 	wg.Wait()
 	err := system.Root.PoisonFuture(actuaryID).Wait()

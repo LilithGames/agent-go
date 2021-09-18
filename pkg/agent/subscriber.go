@@ -11,6 +11,7 @@ import (
 	"github.com/magicsea/behavior3go/core"
 	"go.uber.org/zap"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -102,7 +103,8 @@ type Message struct {
 	Data       *json.RawMessage `json:"data"`
 	Extensions struct {
 		Debug struct {
-			SendTime int64 `json:"send_time"`
+			SendTime string `json:"send_time"`
+			RecvTime string `json:"recv_time"`
 		} `json:"debug"`
 	} `json:"extensions"`
 }
@@ -133,7 +135,11 @@ func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick Ticker) Messa
 			}
 		}
 		var outcome transfer.Outcome
-		start := time.Unix(rawMsg.Extensions.Debug.SendTime, 0).UnixNano()
+		start, err := strconv.ParseInt(rawMsg.Extensions.Debug.SendTime, 10, 64)
+		if err != nil {
+			log.Error("parse send time error", zap.Error(err))
+			return err
+		}
 		outcome.Consume = time.Now().UnixNano() - start
 		if g.callback != nil {
 			err = g.callback(tick, rawMsg.Data, err)

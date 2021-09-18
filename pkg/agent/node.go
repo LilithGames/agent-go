@@ -2,7 +2,6 @@ package agent
 
 import (
 	"context"
-	"github.com/AsynkronIT/protoactor-go/actor"
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/magicsea/behavior3go"
@@ -53,8 +52,7 @@ func (n *Action) OnTick(ticker core.Ticker) behavior3go.Status {
 	if begin == nil && status == behavior3go.RUNNING {
 		tick.Blackboard().SetMem(beginKey, start)
 	}
-	actorCtx := tick.Blackboard().GetMem("actorCtx").(actor.Context)
-	actorCtx.Send(tick.stat(), &outcome)
+	tick.actorCtx().Send(tick.stat(), &outcome)
 	return n.currentStatus(tick.context(), status)
 }
 

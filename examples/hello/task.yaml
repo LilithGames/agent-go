@@ -1,7 +1,7 @@
 plans:
 
   - treeName: team
-    robotNum: 10
+    robotNum: 2
     parallel: 10
     interval: 1
 

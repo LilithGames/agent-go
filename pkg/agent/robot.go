@@ -48,30 +48,25 @@ func (t *job) withMarket(market *Market) *job {
 }
 
 type robot struct {
+	task *job
 }
 
-func newRobot() actor.Actor {
-	return &robot{}
+func newRobot(j *job) *robot {
+	return &robot{task: j}
 }
 
-func (r *robot) Receive(ctx actor.Context) {
-	if msg, ok := ctx.Message().(*job); ok {
-		r.execute(ctx, msg)
-	}
-}
-
-func (r *robot) execute(ctx actor.Context, task *job) {
+func (r *robot) execute(rootCtx *actor.RootContext) {
 	start := time.Now()
 	outcome := transfer.Outcome{Name: "whole_process"}
 	board := core.NewBlackboard()
-	board.SetMem("actorCtx", ctx)
 	tick := NewTicker()
-	tick.market = task.market
-	tick.ctx = task.ctx
-	tick.statPID = task.statPID
+	tick.market = r.task.market
+	tick.ctx = r.task.ctx
+	tick.statPID = r.task.statPID
+	tick.actorRootContext = rootCtx
 	var status behavior3go.Status
 	for {
-		status := task.tree.Tick(tick, nil, board)
+		status = r.task.tree.Tick(tick, nil, board)
 		if status != behavior3go.RUNNING {
 			break
 		}
@@ -80,6 +75,6 @@ func (r *robot) execute(ctx actor.Context, task *job) {
 	outcome.Status = transfer.STATUS(status)
 	outcome.Consume = time.Since(start).Nanoseconds()
 	outcome.Class = transfer.CLASS_HANDLER
-	ctx.Send(task.statPID, &outcome)
-	task.waitGroup.Done()
+	rootCtx.Send(r.task.statPID, &outcome)
+	r.task.waitGroup.Done()
 }

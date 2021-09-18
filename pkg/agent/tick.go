@@ -72,11 +72,9 @@ func (h *Market) Index() int {
 type Ticker interface {
 	core.Ticker
 	Marget() *Market
-	setMarket(market *Market)
 	context() context.Context
-	setContext(ctx context.Context)
 	stat() *actor.PID
-	setStatPID(pid *actor.PID)
+	actorCtx() *actor.RootContext
 	RecvTime(timestamp time.Duration)
 	SendTime(timestamp time.Duration)
 }
@@ -85,6 +83,7 @@ type Tick struct {
 	core.Tick
 	market  *Market
 	ctx     context.Context
+	actorRootContext *actor.RootContext
 	statPID *actor.PID
 	recvTime time.Duration
 	sendTime time.Duration
@@ -100,24 +99,16 @@ func (t *Tick) Marget() *Market {
 	return t.market
 }
 
-func (t *Tick) setMarket(market *Market) {
-	t.market = market
-}
-
 func (t *Tick) context() context.Context {
 	return t.ctx
-}
-
-func (t *Tick) setContext(ctx context.Context) {
-	t.ctx = ctx
 }
 
 func (t *Tick) stat() *actor.PID {
 	return t.statPID
 }
 
-func (t *Tick) setStatPID(pid *actor.PID) {
-	t.statPID = pid
+func (t *Tick) actorCtx() *actor.RootContext {
+	return t.actorRootContext
 }
 
 func (t *Tick) RecvTime(timestamp time.Duration) {
