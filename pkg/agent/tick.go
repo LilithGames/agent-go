@@ -76,8 +76,8 @@ type Ticker interface {
 	context() context.Context
 	stat() *actor.PID
 	actorCtx() *actor.RootContext
-	RecvTime(timestamp int64)
-	SendTime(timestamp int64)
+	RecvTime(unixNano string)
+	SendTime(unixNano string)
 }
 
 type Tick struct {
