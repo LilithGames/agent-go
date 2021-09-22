@@ -107,13 +107,7 @@ func (b *Behavior) BuildEngineFromConfig(conf []byte) *Engine {
 		}
 	}
 	engine.plans = cfg.Plans
-	core.SetSubTreeLoadFunc(func(name string) *core.BehaviorTree {
-		if t, ok := b.trees[name]; ok {
-			return loader.CreateBevTreeFromConfig(&t, b.registerMap)
-		}
-		log.Panic("create sub tree not found.")
-		return nil
-	})
+	b.registerSubTreeLoadFunc()
 	return engine
 }
 
@@ -121,7 +115,18 @@ func (b *Behavior) BuildTestEngine(envs map[string]string, plan *transfer.Plan) 
 	engine := &Engine{Behavior: b}
 	engine.envs = envs
 	engine.plans = append(engine.plans, plan)
+	b.registerSubTreeLoadFunc()
 	return engine
+}
+
+func (b *Behavior) registerSubTreeLoadFunc() {
+	core.SetSubTreeLoadFunc(func(name string) *core.BehaviorTree {
+		if t, ok := b.trees[name]; ok {
+			return loader.CreateBevTreeFromConfig(&t, b.registerMap)
+		}
+		log.Panic("create sub tree not found.")
+		return nil
+	})
 }
 
 type Engine struct {
