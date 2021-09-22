@@ -20,6 +20,6 @@ require (
 )
 
 replace (
-	github.com/hasura/go-graphql-client => github.com/LilithGames/go-graphql-client v0.3.0
-	github.com/magicsea/behavior3go => github.com/LilithGames/behavior3go v0.0.8
+	github.com/hasura/go-graphql-client => github.com/LilithGames/go-graphql-client v1.0.1
+	github.com/magicsea/behavior3go => github.com/LilithGames/behavior3go v1.0.1
 )

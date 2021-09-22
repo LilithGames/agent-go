@@ -59,14 +59,14 @@ func (r *robot) execute(rootCtx *actor.RootContext) {
 	start := time.Now()
 	outcome := transfer.Outcome{Name: "whole_process"}
 	board := core.NewBlackboard()
-	tick := NewTicker()
+	tick := NewTick()
 	tick.market = r.task.market
 	tick.ctx = r.task.ctx
 	tick.statPID = r.task.statPID
 	tick.actorRootContext = rootCtx
 	var status behavior3go.Status
 	for {
-		status = r.task.tree.Tick(tick, nil, board)
+		status = r.task.tree.Tick(tick, board)
 		if status != behavior3go.RUNNING {
 			break
 		}

@@ -39,18 +39,10 @@ func (n *Action) OnTick(ticker core.Ticker) behavior3go.Status {
 		outcome.Err = err.Error()
 	}
 	outcome.Name = name
-	if status == behavior3go.RUNNING {
-		outcome.Name = "polling_" + name
-	}
-	outcome.Consume = time.Since(start).Nanoseconds()
-
-	beginKey := "begin:" + name
-	begin := tick.Blackboard().GetMem(beginKey)
-	if begin != nil && status != behavior3go.RUNNING {
-		outcome.Consume = time.Since(begin.(time.Time)).Nanoseconds()
-	}
-	if begin == nil && status == behavior3go.RUNNING {
-		tick.Blackboard().SetMem(beginKey, start)
+	if start.UnixNano() < tick.recvTime {
+		outcome.Consume = tick.sendTime - tick.recvTime
+	} else {
+		outcome.Consume = time.Since(start).Nanoseconds()
 	}
 	tick.actorCtx().Send(tick.stat(), &outcome)
 	return n.currentStatus(tick.context(), status)

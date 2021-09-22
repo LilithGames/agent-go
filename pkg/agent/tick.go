@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"github.com/magicsea/behavior3go/core"
+	"strconv"
 	"sync/atomic"
 	"time"
 )
@@ -75,8 +76,8 @@ type Ticker interface {
 	context() context.Context
 	stat() *actor.PID
 	actorCtx() *actor.RootContext
-	RecvTime(timestamp time.Duration)
-	SendTime(timestamp time.Duration)
+	RecvTime(timestamp int64)
+	SendTime(timestamp int64)
 }
 
 type Tick struct {
@@ -85,13 +86,29 @@ type Tick struct {
 	ctx     context.Context
 	actorRootContext *actor.RootContext
 	statPID *actor.PID
-	recvTime time.Duration
-	sendTime time.Duration
+	recvTime int64
+	sendTime int64
 }
 
-func NewTicker() *Tick {
+func NewTick() *Tick {
 	tick := &Tick{}
 	tick.Initialize()
+	return tick
+}
+
+// 用于并行的情况，分裂解决并发问题，一个行为树协程上下文使用一个tick
+func (t *Tick) Tear(ticker core.Ticker) {
+	tick := ticker.(*Tick)
+	tick.market = t.market
+	tick.ctx = t.ctx
+	tick.statPID = t.statPID
+	tick.actorRootContext = t.actorRootContext
+	t.Tick.Tear(&tick.Tick)
+}
+
+func (t *Tick) TearTick() core.Ticker {
+	tick := NewTick()
+	t.Tear(tick)
 	return tick
 }
 
@@ -111,10 +128,18 @@ func (t *Tick) actorCtx() *actor.RootContext {
 	return t.actorRootContext
 }
 
-func (t *Tick) RecvTime(timestamp time.Duration) {
-	t.recvTime = timestamp
+func (t *Tick) RecvTime(unixNano string) {
+	t.recvTime = strToInt64(unixNano)
 }
 
-func (t *Tick) SendTime(timestamp time.Duration) {
-	t.sendTime = timestamp
+func (t *Tick) SendTime(unixNano string) {
+	t.sendTime = strToInt64(unixNano)
+}
+
+func strToInt64(s string) int64 {
+	v, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0
+	}
+	return v
 }
