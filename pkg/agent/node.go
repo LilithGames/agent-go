@@ -2,12 +2,11 @@ package agent
 
 import (
 	"context"
+	"fmt"
 	"github.com/LilithGames/agent-go/pkg/transfer"
-	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/magicsea/behavior3go"
 	"github.com/magicsea/behavior3go/config"
 	"github.com/magicsea/behavior3go/core"
-	"go.uber.org/zap"
 	"math/rand"
 	"time"
 )
@@ -27,9 +26,9 @@ func (n *Action) Initialize(params *config.BTNodeCfg) {
 
 func (n *Action) OnTick(ticker core.Ticker) behavior3go.Status {
 	tick := ticker.(*Tick)
-	defer n.recoverPanic()
 	time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)+10))
 	name := n.GetName()
+	defer n.recoverPanic(name, tick)
 	var outcome transfer.Outcome
 	outcome.Class = transfer.CLASS_HANDLER
 	start := time.Now()
@@ -57,8 +56,13 @@ func (n *Action) currentStatus(ctx context.Context, status behavior3go.Status) b
 	}
 }
 
-func (n *Action) recoverPanic() {
+func (n *Action) recoverPanic(name string, tick *Tick) {
 	if r := recover(); r != nil {
-		log.Error("recover panic error", zap.Any("recover", r))
+		var outcome transfer.Outcome
+		outcome.Name = name
+		outcome.Status = transfer.STATUS_FAILURE
+		outcome.Class = transfer.CLASS_HANDLER
+		outcome.Err = fmt.Sprintf("receive panic: %v", r)
+		tick.actorCtx().Send(tick.stat(), &outcome)
 	}
 }

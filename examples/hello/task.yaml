@@ -1,6 +1,6 @@
 plans:
 
-  - treeName: team
+  - treeName: subHello
     robotNum: 2
     parallel: 10
     interval: 1
