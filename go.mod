@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/AsynkronIT/protoactor-go v0.0.0-20210520041424-43065ace108f
 	github.com/ghodss/yaml v1.0.0
-	github.com/hasura/go-graphql-client v0.2.0
+	github.com/hasura/go-graphql-client v0.3.0
 	github.com/magicsea/behavior3go v0.0.0-20201106103304-15430dcfecd8
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/rs/xid v1.3.0
@@ -20,6 +20,6 @@ require (
 )
 
 replace (
-	github.com/hasura/go-graphql-client => github.com/LilithGames/go-graphql-client v1.0.1
-	github.com/magicsea/behavior3go => github.com/LilithGames/behavior3go v1.0.1
+	github.com/hasura/go-graphql-client => github.com/LilithGames/go-graphql-client v1.0.2
+	github.com/magicsea/behavior3go => github.com/LilithGames/behavior3go v1.0.2
 )
