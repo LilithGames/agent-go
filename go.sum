@@ -9,8 +9,8 @@ github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/LilithGames/behavior3go v1.0.2 h1:A53hDYXen/ocoXR161Xbq9tocQ32vjjztBk0IiJbwEE=
 github.com/LilithGames/behavior3go v1.0.2/go.mod h1:bqTRjmUHkU8u5UmTRzPJWkZeGRj6AJaYBlXksX5lpBc=
-github.com/LilithGames/go-graphql-client v1.0.2 h1:lHvBVUy66wcyKJrdkXu6nvCkRDjSpZEDwzMLP12OPkY=
-github.com/LilithGames/go-graphql-client v1.0.2/go.mod h1:ovhXpnBL/+pYmmdYHndovgAc/wmhaXKvKwJETjtMomQ=
+github.com/LilithGames/go-graphql-client v1.0.3 h1:HIuR9vI10rVMOQs1MpCwBCqHLrTw3pHMKbq4+3vgxmo=
+github.com/LilithGames/go-graphql-client v1.0.3/go.mod h1:ovhXpnBL/+pYmmdYHndovgAc/wmhaXKvKwJETjtMomQ=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Workiva/go-datastructures v1.0.53 h1:J6Y/52yX10Xc5JjXmGtWoSSxs3mZnGSaq37xZZh7Yig=
 github.com/Workiva/go-datastructures v1.0.53/go.mod h1:1yZL+zfsztete+ePzZz/Zb1/t5BnDuE2Ya2MMGhzP6A=

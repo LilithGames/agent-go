@@ -4,7 +4,7 @@
   "data": {
     "version": "0.3.0",
     "scope": "project",
-    "selectedTree": "8cacc959-0f85-4770-862f-56ef34454b73",
+    "selectedTree": "efa2655f-7539-4628-a1d6-c401aa4211fa",
     "trees": [
       {
         "version": "0.3.0",
@@ -203,7 +203,8 @@
               "y": -36
             },
             "children": [
-              "66e17b2b-528d-4ee9-8073-690f08843856"
+              "66e17b2b-528d-4ee9-8073-690f08843856",
+              "80fa720b-f021-4dbe-8303-c839c7b37dda"
             ]
           },
           "c9c9d022-ca8f-4140-8ab3-3ca618fb2820": {
@@ -232,6 +233,33 @@
               "y": -108
             },
             "child": "c9c9d022-ca8f-4140-8ab3-3ca618fb2820"
+          },
+          "80fa720b-f021-4dbe-8303-c839c7b37dda": {
+            "id": "80fa720b-f021-4dbe-8303-c839c7b37dda",
+            "name": "TestSubscription",
+            "category": "composite",
+            "title": "TestSubscription",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -12,
+              "y": 60
+            },
+            "children": [
+              "78e7acd0-a200-488d-a312-e0bb1dfa1184"
+            ]
+          },
+          "78e7acd0-a200-488d-a312-e0bb1dfa1184": {
+            "id": "78e7acd0-a200-488d-a312-e0bb1dfa1184",
+            "name": "TestSubscriber",
+            "category": "action",
+            "title": "TestSubscriber",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 240,
+              "y": 60
+            }
           }
         },
         "display": {
