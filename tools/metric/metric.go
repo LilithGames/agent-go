@@ -1,6 +1,9 @@
 package metric
 
 import (
+	"log"
+	"time"
+
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric/global"
@@ -8,14 +11,12 @@ import (
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
 	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
 	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
-	"log"
-	"time"
 )
 
 func MetricsExport() *prometheus.Exporter {
 	config := prometheus.Config{}
 	c := controller.New(
-		processor.New(
+		processor.NewFactory(
 			selector.NewWithHistogramDistribution(),
 			export.DeltaExportKindSelector(),
 		),
