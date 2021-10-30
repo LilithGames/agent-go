@@ -10,4 +10,4 @@ build:
 
 .PHONY: build-image
 build-image: build
-	@docker-compose -f examples/deploy/docker-compose.yaml build hello
+	@docker-compose -f examples/deploy/docker-compose.yaml build
