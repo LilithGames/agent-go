@@ -3,20 +3,20 @@ module github.com/LilithGames/agent-go
 go 1.17
 
 require (
-	github.com/AsynkronIT/protoactor-go v0.0.0-20210520041424-43065ace108f
+	github.com/AsynkronIT/protoactor-go v0.0.0-20211018041209-5fdd594ca443
 	github.com/ghodss/yaml v1.0.0
 	github.com/hasura/go-graphql-client v0.4.0
 	github.com/magicsea/behavior3go v0.0.0-20201106103304-15430dcfecd8
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/rs/xid v1.3.0
-	go.opentelemetry.io/contrib/instrumentation/runtime v0.25.0
+	go.opentelemetry.io/contrib/instrumentation/runtime v0.26.0
 	go.opentelemetry.io/otel/exporters/prometheus v0.24.0
 	go.opentelemetry.io/otel/metric v0.24.0
 	go.opentelemetry.io/otel/sdk/export/metric v0.24.0
 	go.opentelemetry.io/otel/sdk/metric v0.24.0
-	go.uber.org/zap v1.16.0
-	google.golang.org/grpc v1.38.0
-	google.golang.org/protobuf v1.26.0
+	go.uber.org/zap v1.19.1
+	google.golang.org/grpc v1.41.0
+	google.golang.org/protobuf v1.27.1
 )
 
 require (
@@ -40,11 +40,11 @@ require (
 	go.opentelemetry.io/otel/sdk v1.0.1 // indirect
 	go.opentelemetry.io/otel/trace v1.0.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	go.uber.org/multierr v1.5.0 // indirect
-	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb // indirect
+	go.uber.org/multierr v1.6.0 // indirect
+	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
 	golang.org/x/sys v0.0.0-20210603081109-ebe580a85c40 // indirect
-	golang.org/x/text v0.3.3 // indirect
-	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
+	golang.org/x/text v0.3.5 // indirect
+	google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
 )

@@ -162,7 +162,7 @@ func pushData(outcomes []*transfer.Outcome) {
 	}
 }
 
-func pushLocalData(planName string, report *transfer.Report) error {
+func pushLocalData(report *transfer.Report) error {
 	pushData(report.Outcomes)
 	return nil
 }

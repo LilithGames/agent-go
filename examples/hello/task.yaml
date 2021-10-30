@@ -1,8 +1,8 @@
 plans:
 
-  - treeName: subcription
-    robotNum: 2
-    parallel: 10
+  - treeName: subHello
+    robotNum: 10
+    parallel: 1
     interval: 1
 
 environments:

@@ -61,7 +61,7 @@ func (s *proxyStream) finishPlan(planName string) error {
 
 func (s *proxyStream) sendReport(planName string, report *transfer.Report) error {
 	if s.client == nil {
-		return pushLocalData(planName, report)
+		return pushLocalData(report)
 	}
 	report.PlanID = s.formatPlanID(planName)
 	content, err := proto.Marshal(report)
