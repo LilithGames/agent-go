@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/AsynkronIT/protoactor-go v0.0.0-20211018041209-5fdd594ca443
 	github.com/ghodss/yaml v1.0.0
+	github.com/gorilla/websocket v1.4.2
 	github.com/hasura/go-graphql-client v0.4.0
 	github.com/magicsea/behavior3go v0.0.0-20201106103304-15430dcfecd8
 	github.com/olekukonko/tablewriter v0.0.5

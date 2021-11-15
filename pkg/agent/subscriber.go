@@ -2,16 +2,19 @@ package agent
 
 import (
 	"encoding/json"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
+	"github.com/gorilla/websocket"
 	"github.com/hasura/go-graphql-client"
 	"github.com/magicsea/behavior3go/actions"
 	"github.com/magicsea/behavior3go/composites"
 	"github.com/magicsea/behavior3go/core"
 	"go.uber.org/zap"
-	"os"
-	"strconv"
-	"time"
 )
 
 type ClientOption func(client *graphql.SubscriptionClient)
@@ -76,6 +79,7 @@ func NewGqlSubscription(options ...ClientOption) *GqlSubscription {
 			log.Panic("graphql backend not found")
 		}
 		client := graphql.NewSubscriptionClient(backend)
+		client.WithWebSocket(newWebsocketConn)
 		if subscription.token != "" {
 			client.WithConnectionParams(map[string]interface{}{
 				"Authorization": subscription.token,
@@ -87,6 +91,18 @@ func NewGqlSubscription(options ...ClientOption) *GqlSubscription {
 		return client
 	}
 	return subscription
+}
+
+func newWebsocketConn(sc *graphql.SubscriptionClient) (graphql.WebsocketConn, error) {
+	rawURL := sc.GetURL()
+	if strings.Contains(rawURL, "https") {
+		rawURL = strings.ReplaceAll(rawURL, "https", "wss")
+	}
+	if strings.Contains(rawURL, "http") {
+		rawURL = strings.ReplaceAll(rawURL, "http", "ws")
+	}
+	conn, _, err := websocket.DefaultDialer.Dial(rawURL, nil)
+	return conn, err
 }
 
 type GqlSubscriber struct {
