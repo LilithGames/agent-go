@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric/global"
-	export "go.opentelemetry.io/otel/sdk/export/metric"
+	"go.opentelemetry.io/otel/sdk/export/metric/aggregation"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
 	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
 	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
@@ -18,7 +18,7 @@ func MetricsExport() *prometheus.Exporter {
 	c := controller.New(
 		processor.NewFactory(
 			selector.NewWithHistogramDistribution(),
-			export.DeltaExportKindSelector(),
+			aggregation.DeltaTemporalitySelector(),
 		),
 	)
 	if err := runtime.Start(runtime.WithMinimumReadMemStatsInterval(time.Second)); err != nil {
