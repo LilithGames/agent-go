@@ -3,6 +3,7 @@ package agent
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -168,6 +169,9 @@ func pushLocalData(report *transfer.Report) error {
 }
 
 func echoLocalData(planName string, view *ViewOpt) {
+	if os.Getenv("ECHO") == "ignore" {
+		return
+	}
 	printQuantitySlice(planName+":H", quantities.Handler, view)
 	printQuantitySlice(planName+":E", quantities.Event, view)
 	printErrorMessage(planName+":H", quantities.Handler, view)

@@ -18,8 +18,10 @@ func MetricsExport() *prometheus.Exporter {
 	c := controller.New(
 		processor.NewFactory(
 			selector.NewWithHistogramDistribution(),
-			aggregation.DeltaTemporalitySelector(),
+			aggregation.CumulativeTemporalitySelector(),
+			processor.WithMemory(false),
 		),
+		controller.WithCollectPeriod(time.Second),
 	)
 	if err := runtime.Start(runtime.WithMinimumReadMemStatsInterval(time.Second)); err != nil {
 		log.Panic("create runtime metric error", err)

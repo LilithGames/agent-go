@@ -37,10 +37,10 @@ func NewAgent(engine *Engine, opts ...*AgentOpt) *Agent {
 }
 
 func (a *Agent) Start() {
+	go a.startMetricServer()
 	if a.endpoint == "" {
 		a.startDefaultAgent()
 	} else {
-		go a.startMetricServer()
 		a.startClusterAgent()
 	}
 }
@@ -87,6 +87,6 @@ func (a *Agent) newOutgoingContext() context.Context {
 func (a *Agent) startMetricServer() {
 	exporter := metric.MetricsExport()
 	http.HandleFunc("/metrics", exporter.ServeHTTP)
-	err := http.ListenAndServe(":2222", nil)
+	err := http.ListenAndServe(":6060", nil)
 	log.Panic("start metric error", zap.Error(err))
 }

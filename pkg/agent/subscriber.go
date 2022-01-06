@@ -184,7 +184,7 @@ func NewGqlSubscriber(name string, query interface{}) *GqlSubscriber {
 		tick := ticker.(*Tick)
 		subClient := client.(*graphql.SubscriptionClient)
 		wrapHandler := subscriber.GqlSubscriberWrapHandler(name, tick)
-		_, err := subClient.NamedSubscribe(name, query, subscriber.variables, wrapHandler)
+		_, err := subClient.Subscribe(query, subscriber.variables, wrapHandler, graphql.OperationName(name))
 		return err
 	}
 	return subscriber

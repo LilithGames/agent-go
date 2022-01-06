@@ -2,13 +2,19 @@ package agent
 
 import (
 	"context"
+	"sync"
+	"time"
+
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/magicsea/behavior3go"
 	"github.com/magicsea/behavior3go/core"
-	"sync"
-	"time"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/global"
 )
+
+var oc =  metric.Must(global.Meter("agent")).NewInt64Counter("agent_stress_task_outcome")
 
 type job struct {
 	statPID   *actor.PID
@@ -72,9 +78,21 @@ func (r *robot) execute(rootCtx *actor.RootContext) {
 		}
 		time.Sleep(time.Second)
 	}
+	r.addMetric(r.task.tree.GetTitile(), status)
 	outcome.Status = transfer.STATUS(status)
 	outcome.Consume = time.Since(start).Nanoseconds()
 	outcome.Class = transfer.CLASS_HANDLER
 	rootCtx.Send(r.task.statPID, &outcome)
 	r.task.waitGroup.Done()
+}
+
+func (r *robot) addMetric(name string, status behavior3go.Status) {
+	tl := attribute.String("task", name)
+	ctx := context.Background()
+	switch status {
+	case behavior3go.FAILURE, behavior3go.ERROR:
+		oc.Add(ctx, 1, tl, attribute.String("status", "failure"))
+	case behavior3go.SUCCESS:
+		oc.Add(ctx, 1, tl, attribute.String("status", "success"))
+	}
 }

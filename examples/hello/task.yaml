@@ -1,9 +1,13 @@
 plans:
 
   - treeName: subHello
-    robotNum: 10
+    robotNum: 1
     parallel: 1
-    interval: 1
+
+  - treeName: subHello
+    robotNum: 1
+    parallel: 1
 
 environments:
-  backend: http://127.0.0.1:8085/query
+  mode: circle
+  echo: ignore

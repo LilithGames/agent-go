@@ -70,77 +70,55 @@ func (m *manager) receiveMail(mailbox chan *transfer.Mail) {
 	}
 }
 
-func (m *manager) setEngineEnvs(content []byte) error {
-	var envs map[string]string
-	err := json.Unmarshal(content, &envs)
-	if err != nil {
-		return err
-	}
-	for k, v := range envs {
-		err = os.Setenv(k, v)
-		if err != nil {
-			return err
-		}
+func (m *manager) reviewMail(mail *transfer.Mail) error {
+	switch mail.Action {
+	case transfer.ACTION_START_AGENT:
+		return m.startAgentEngine(mail.Content, false)
+	case transfer.ACTION_START_CIRCLE:
+		return m.startAgentEngine(mail.Content, true)
 	}
 	return nil
 }
 
-func (m *manager) reviewMail(mail *transfer.Mail) error {
-	switch mail.Action {
-	case transfer.ACTION_START_AGENT:
-		return m.startAgentOnceEngine(mail.Content)
-	case transfer.ACTION_START_CIRCLE:
-		return m.startAgentCircleEngine(mail.Content)
-	default:
-		return nil
+func (m *manager) startAgentEngine(content []byte, circle bool) error {
+	var envs map[string]string
+	err := json.Unmarshal(content, &envs)
+	if err != nil {
+		return fmt.Errorf("unmarshal envs error: %w", err)
 	}
+	for k, v := range envs {
+		os.Setenv(k, v)
+	}
+	m.stream.setPlanCount(len(m.engine.plans), circle)
+	m.startAgentExecutors(circle)
+	return nil
 }
 
-func (m *manager) startAgentCircleEngine(content []byte) error {
-	err := m.setEngineEnvs(content)
-	if err != nil {
-		return err
+func (m *manager) startLocalService() {
+	for k, v := range m.engine.envs {
+		os.Setenv(k, v)
 	}
-	m.stream.setPlanCount(len(m.engine.plans), true)
+	var circle bool
+	if os.Getenv("mode") == "circle" {
+		circle = true
+	}
+	m.stream.setPlanCount(len(m.engine.plans), circle)
+	m.startAgentExecutors(circle)
+}
+
+func (m *manager) startAgentExecutors(circle bool) {
 	executors, market := m.buildExecutors()
 	for {
 		for _, exec := range executors {
 			select {
 			case <-m.ctx.Done():
-				return nil
+				return
 			default:
 				m.startExecutor(exec, market)
 			}
 		}
-	}
-}
-
-func (m *manager) startAgentOnceEngine(content []byte) error {
-	err := m.setEngineEnvs(content)
-	if err != nil {
-		return fmt.Errorf("set envs error: %w", err)
-	}
-	m.stream.setPlanCount(len(m.engine.plans), false)
-	m.startAgentOnceExecutors()
-	return nil
-}
-
-func (m *manager) startLocalService() {
-	m.stream.setPlanCount(len(m.engine.plans), false)
-	for k, v := range m.engine.envs {
-		_ = os.Setenv(k, v)
-	}
-	m.startAgentOnceExecutors()
-}
-
-func (m *manager) startAgentOnceExecutors() {
-	executors, market := m.buildExecutors()
-	for _, exec := range executors {
-		select {
-		case <-m.ctx.Done():
+		if !circle {
 			return
-		default:
-			m.startExecutor(exec, market)
 		}
 	}
 }
