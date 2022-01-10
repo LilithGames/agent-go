@@ -15,7 +15,7 @@ import (
 	"go.opentelemetry.io/otel/metric/global"
 )
 
-var hc =  metric.Must(global.Meter("agent")).NewInt64Counter("agent_stress_handler_outcome")
+var hc = metric.Must(global.Meter("agent")).NewInt64Counter("agent_stress_handler_outcome")
 
 type Handler func(ticker Ticker) (behavior3go.Status, error)
 
@@ -43,7 +43,7 @@ func (n *Action) OnTick(ticker core.Ticker) behavior3go.Status {
 	if err != nil {
 		outcome.Err = err.Error()
 	}
-	
+
 	outcome.Name = name
 	if start.UnixNano() < tick.recvTime {
 		outcome.Consume = tick.sendTime - tick.recvTime

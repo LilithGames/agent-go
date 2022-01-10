@@ -17,12 +17,16 @@ type Market struct {
 	idx    int64
 	hub    chan One
 	amount int
-	roster []One
+	roster map[string]One
 }
 
 func newMarket(amount int) *Market {
 	amount = amount * 2
-	return &Market{amount: amount, hub: make(chan One, amount)}
+	return &Market{
+		amount: amount,
+		hub:    make(chan One, amount),
+		roster: make(map[string]One),
+	}
 }
 
 func (h *Market) PushOne(one One) {
@@ -52,7 +56,7 @@ func (h *Market) JoinOne(one One) {
 }
 
 func (h *Market) UseOne(one One) {
-	h.roster = append(h.roster, one)
+	h.roster[one.ID()] = one
 }
 
 func (h *Market) InviteOne() One {
@@ -69,7 +73,7 @@ func (h *Market) reset() {
 	for _, o := range h.roster {
 		h.hub <- o
 	}
-	h.roster = make([]One, 0)
+	h.roster = map[string]One{}
 }
 
 func (h *Market) Index() int {
@@ -88,12 +92,12 @@ type Ticker interface {
 
 type Tick struct {
 	core.Tick
-	market  *Market
-	ctx     context.Context
+	market           *Market
+	ctx              context.Context
 	actorRootContext *actor.RootContext
-	statPID *actor.PID
-	recvTime int64
-	sendTime int64
+	statPID          *actor.PID
+	recvTime         int64
+	sendTime         int64
 }
 
 func NewTick() *Tick {

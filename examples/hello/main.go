@@ -2,9 +2,9 @@ package main
 
 import (
 	_ "embed"
-	"github.com/LilithGames/agent-go/pkg/agent"
 	"encoding/json"
 	"fmt"
+	"github.com/LilithGames/agent-go/pkg/agent"
 	"github.com/hasura/go-graphql-client"
 	"github.com/magicsea/behavior3go"
 	"github.com/magicsea/behavior3go/core"
@@ -49,7 +49,7 @@ func HelloA(tick agent.Ticker) (behavior3go.Status, error) {
 	one := tick.Marget().InviteOne()
 	if one == nil {
 		p = NewPlayer(xid.New().String())
-		tick.Marget().UseOne(p) 
+		tick.Marget().UseOne(p)
 		fmt.Println("new player id", p.ID())
 	} else {
 		p = one.(*Player)

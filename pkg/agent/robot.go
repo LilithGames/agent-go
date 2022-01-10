@@ -14,7 +14,7 @@ import (
 	"go.opentelemetry.io/otel/metric/global"
 )
 
-var oc =  metric.Must(global.Meter("agent")).NewInt64Counter("agent_stress_task_outcome")
+var oc = metric.Must(global.Meter("agent")).NewInt64Counter("agent_stress_task_outcome")
 
 type job struct {
 	statPID   *actor.PID
