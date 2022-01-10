@@ -171,7 +171,6 @@
               "87d3e037-156b-475e-b935-287a732981ae",
               "ec58b1b2-fd58-4064-8382-96ddda694b45",
               "3752a7e4-8211-4d53-8a4e-51721b9af7cb",
-              "8233b21c-feed-42b4-be55-92987d2270ac",
               "67fcb644-e242-4e93-90b4-a5758fe25808"
             ]
           },
@@ -186,19 +185,7 @@
             },
             "display": {
               "x": 204,
-              "y": 252
-            }
-          },
-          "8233b21c-feed-42b4-be55-92987d2270ac": {
-            "id": "8233b21c-feed-42b4-be55-92987d2270ac",
-            "name": "5daf5bdf-0bea-45b6-bcae-0a5fd0e66181",
-            "category": "tree",
-            "title": "friend",
-            "description": "",
-            "properties": {},
-            "display": {
-              "x": 204,
-              "y": 156
+              "y": 144
             }
           }
         },

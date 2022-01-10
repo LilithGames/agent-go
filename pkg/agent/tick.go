@@ -15,18 +15,18 @@ type One interface {
 
 type Market struct {
 	idx    int64
-	pre    chan One
-	cur    chan One
 	hub    chan One
 	amount int
+	roster []One
 }
 
 func newMarket(amount int) *Market {
-	return &Market{cur: make(chan One, amount), amount: amount, hub: make(chan One, amount)}
+	amount = amount * 2
+	return &Market{amount: amount, hub: make(chan One, amount)}
 }
 
 func (h *Market) PushOne(one One) {
-	h.cur <- one
+	h.hub <- one
 }
 
 func (h *Market) RequireOne(like func(One) bool) One {
@@ -36,9 +36,9 @@ func (h *Market) RequireOne(like func(One) bool) One {
 		i    int
 	)
 	for !flag {
-		one = <-h.cur
+		one = <-h.hub
 		flag = like(one)
-		h.cur <- one
+		h.hub <- one
 		i++
 		if i >= h.amount {
 			return nil
@@ -51,19 +51,25 @@ func (h *Market) JoinOne(one One) {
 	h.hub <- one
 }
 
+func (h *Market) UseOne(one One) {
+	h.roster = append(h.roster, one)
+}
+
 func (h *Market) InviteOne() One {
 	select {
 	case one := <-h.hub:
+		h.UseOne(one)
 		return one
-	case <-time.After(time.Second):
+	case <-time.After(time.Millisecond * 10):
 		return nil
 	}
 }
 
 func (h *Market) reset() {
-	h.pre = h.cur
-	h.cur = make(chan One, h.amount)
-	h.hub = make(chan One, h.amount)
+	for _, o := range h.roster {
+		h.hub <- o
+	}
+	h.roster = make([]One, 0)
 }
 
 func (h *Market) Index() int {

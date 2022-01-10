@@ -45,6 +45,16 @@ func HelloHandlers() agent.Handlers {
 }
 
 func HelloA(tick agent.Ticker) (behavior3go.Status, error) {
+	var p *Player
+	one := tick.Marget().InviteOne()
+	if one == nil {
+		p = NewPlayer(xid.New().String())
+		tick.Marget().UseOne(p) 
+		fmt.Println("new player id", p.ID())
+	} else {
+		p = one.(*Player)
+	}
+	fmt.Println("current player id: ", p.ID())
 	return behavior3go.SUCCESS, nil
 }
 

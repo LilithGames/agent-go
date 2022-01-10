@@ -171,6 +171,7 @@ func (m *manager) startExecutor(executor *executor, market *Market) {
 	if err != nil {
 		log.Error("stop actuary error", zap.Error(err))
 	}
+	market.reset()
 }
 
 func (m *manager) getParallel() int {
