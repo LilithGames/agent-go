@@ -2,11 +2,13 @@ package agent
 
 import (
 	"context"
-	"github.com/AsynkronIT/protoactor-go/actor"
-	"github.com/magicsea/behavior3go/core"
 	"strconv"
+	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/AsynkronIT/protoactor-go/actor"
+	"github.com/magicsea/behavior3go/core"
 )
 
 type One interface {
@@ -18,6 +20,7 @@ type Market struct {
 	hub    chan One
 	amount int
 	roster map[string]One
+	sync.Mutex
 }
 
 func newMarket(amount int) *Market {
@@ -56,7 +59,9 @@ func (h *Market) JoinOne(one One) {
 }
 
 func (h *Market) UseOne(one One) {
+	h.Lock()
 	h.roster[one.ID()] = one
+	h.Unlock()
 }
 
 func (h *Market) InviteOne() One {
