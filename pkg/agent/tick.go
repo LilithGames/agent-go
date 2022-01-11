@@ -82,13 +82,7 @@ func (h *Market) InviteOneLike(like func(One) bool) One {
 }
 
 func(h *Market) InviteOne() One {
-	select {
-	case one := <-h.hub:
-		h.UseOne(one)
-		return one
-	case <-time.After(time.Millisecond * 10):
-		return nil
-	}	
+	return h.InviteOneLike(nil)
 }
 
 func (h *Market) reset() {
