@@ -37,21 +37,21 @@ func (h *Market) PushOne(one One) {
 }
 
 func (h *Market) RequireOne(like func(One) bool) One {
-	var (
-		one  One
-		flag bool
-		i    int
-	)
-	for !flag {
-		one = <-h.hub
-		flag = like(one)
+	var i int
+	for {
+		one := <-h.hub
 		h.hub <- one
+		if like == nil {
+			return one
+		}
+		if like(one) {
+			return one
+		}
 		i++
 		if i >= h.amount {
 			return nil
 		}
 	}
-	return one
 }
 
 func (h *Market) JoinOne(one One) {
@@ -64,14 +64,31 @@ func (h *Market) UseOne(one One) {
 	h.Unlock()
 }
 
-func (h *Market) InviteOne() One {
+func (h *Market) InviteOneLike(like func(One) bool) One {
+	for {
+		select {
+		case one := <-h.hub:
+			h.UseOne(one)
+			if like == nil {
+				return one
+			}
+			if like(one) {
+				return one
+			}
+		case <-time.After(time.Millisecond * 10):
+			return nil
+		}
+	}
+}
+
+func(h *Market) InviteOne() One {
 	select {
 	case one := <-h.hub:
 		h.UseOne(one)
 		return one
 	case <-time.After(time.Millisecond * 10):
 		return nil
-	}
+	}	
 }
 
 func (h *Market) reset() {
