@@ -46,24 +46,36 @@ func HelloHandlers() agent.Handlers {
 
 func HelloA(tick agent.Ticker) (behavior3go.Status, error) {
 	var p *Player
-	one := tick.Marget().InviteOne()
+	one := tick.Marget().InviteAcc()
 	if one == nil {
 		p = NewPlayer(xid.New().String())
-		tick.Marget().UseOne(p)
+		tick.Marget().UseAcc(p)
 		fmt.Println("new player id", p.ID())
 	} else {
 		p = one.(*Player)
 	}
+	tick.Blackboard().SetMem("player", p)
 	fmt.Println("current player id: ", p.ID())
 	return behavior3go.SUCCESS, nil
 }
 
 func HelloB(tick agent.Ticker) (behavior3go.Status, error) {
-	time.Sleep(time.Millisecond * time.Duration(rand.Intn(10)))
 	return behavior3go.SUCCESS, nil
 }
 
 func HelloC(tick agent.Ticker) (behavior3go.Status, error) {
+	p := tick.Blackboard().GetMem("player").(*Player)
+	if tick.Marget().Index() % 2 == 0 {
+		m := tick.Marget().InviteOne()
+		if m != nil {
+			fmt.Println("invite player success: ", m.(*Player).id)
+		} else {
+			fmt.Println("invite player failed")
+		}
+	} else {
+		tick.Marget().JoinOne(p)
+		fmt.Println("player join team: ", p.id)
+	}
 	return behavior3go.SUCCESS, nil
 }
 
@@ -73,6 +85,7 @@ func HelloD(tick agent.Ticker) (behavior3go.Status, error) {
 }
 
 func HelloE(tick agent.Ticker) (behavior3go.Status, error) {
+	fmt.Println("----------------------")
 	return behavior3go.SUCCESS, nil
 }
 

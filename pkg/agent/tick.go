@@ -18,8 +18,9 @@ type One interface {
 type Market struct {
 	idx    int64
 	hub    chan One
+	acc    chan One
 	amount int
-	roster map[string]One
+	used   map[string]One
 	sync.Mutex
 }
 
@@ -28,7 +29,8 @@ func newMarket(amount int) *Market {
 	return &Market{
 		amount: amount,
 		hub:    make(chan One, amount),
-		roster: make(map[string]One),
+		acc:    make(chan One, amount),
+		used:   make(map[string]One),
 	}
 }
 
@@ -58,38 +60,51 @@ func (h *Market) JoinOne(one One) {
 	h.hub <- one
 }
 
-func (h *Market) UseOne(one One) {
+func (h *Market) UseAcc(one One) {
 	h.Lock()
-	h.roster[one.ID()] = one
+	h.used[one.ID()] = one
 	h.Unlock()
 }
 
-func (h *Market) InviteOneLike(like func(One) bool) One {
-	for {
+func (h *Market) InviteLikeOne(like func(One) bool) One {
+	for i := 0; i < h.amount; i++ {
 		select {
 		case one := <-h.hub:
-			h.UseOne(one)
 			if like == nil {
 				return one
 			}
 			if like(one) {
 				return one
+			} else {
+				h.hub <- one
 			}
 		case <-time.After(time.Millisecond * 10):
 			return nil
 		}
 	}
+	return nil
+}
+
+func(h *Market) InviteAcc() One {
+	select {
+	case one := <- h.acc:
+		h.UseAcc(one)
+		return one
+	case <-time.After(time.Millisecond * 10):
+		return nil
+	}
 }
 
 func(h *Market) InviteOne() One {
-	return h.InviteOneLike(nil)
+	return h.InviteLikeOne(nil)
 }
 
 func (h *Market) reset() {
-	for _, o := range h.roster {
-		h.hub <- o
+	h.idx = 0
+	for _, o := range h.used {
+		h.acc <- o
 	}
-	h.roster = map[string]One{}
+	h.hub = make(chan One, h.amount)
 }
 
 func (h *Market) Index() int {
