@@ -7,12 +7,14 @@ import (
 	"time"
 
 	"github.com/LilithGames/agent-go/pkg/transfer"
+	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/magicsea/behavior3go"
 	"github.com/magicsea/behavior3go/config"
 	"github.com/magicsea/behavior3go/core"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
+	"go.uber.org/zap"
 )
 
 var hc = metric.Must(global.Meter("agent")).NewInt64Counter("agent_stress_handler_outcome")
@@ -34,6 +36,7 @@ func (n *Action) OnTick(ticker core.Ticker) behavior3go.Status {
 	tick := ticker.(*Tick)
 	time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)+10))
 	name := n.GetName()
+	task := tick.GetTree().GetTitile()
 	defer n.recoverPanic(name, tick)
 	var outcome transfer.Outcome
 	outcome.Class = transfer.CLASS_HANDLER
@@ -41,9 +44,9 @@ func (n *Action) OnTick(ticker core.Ticker) behavior3go.Status {
 	status, err := n.handler(tick)
 	outcome.Status = transfer.STATUS(status)
 	if err != nil {
+		log.Error("handler error", zap.String("handler", name), zap.String("task", task), zap.Error(err))
 		outcome.Err = err.Error()
 	}
-
 	outcome.Name = name
 	if start.UnixNano() < tick.recvTime {
 		outcome.Consume = tick.sendTime - tick.recvTime
@@ -51,7 +54,7 @@ func (n *Action) OnTick(ticker core.Ticker) behavior3go.Status {
 		outcome.Consume = time.Since(start).Nanoseconds()
 	}
 	tick.actorCtx().Send(tick.stat(), &outcome)
-	n.addMetric(tick.GetTree().GetTitile(), name, status)
+	n.addMetric(task, name, status)
 	return n.currentStatus(tick.context(), status)
 }
 

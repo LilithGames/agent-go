@@ -64,18 +64,18 @@ func HelloB(tick agent.Ticker) (behavior3go.Status, error) {
 }
 
 func HelloC(tick agent.Ticker) (behavior3go.Status, error) {
-	// p := tick.Blackboard().GetMem("player").(*Player)
-	// if tick.Marget().Index() % 2 == 0 {
-	// 	m := tick.Marget().InviteOne()
-	// 	if m != nil {
-	// 		fmt.Println("invite player success: ", m.(*Player).id)
-	// 	} else {
-	// 		fmt.Println("invite player failed")
-	// 	}
-	// } else {
-	// 	tick.Marget().JoinOne(p)
-	// 	fmt.Println("player join team: ", p.id)
-	// }
+	p := tick.Blackboard().GetMem("player").(*Player)
+	if tick.Marget().Index() % 2 == 0 {
+		m := tick.Marget().InviteOne()
+		if m != nil {
+			fmt.Println("invite player success: ", m.(*Player).id)
+		} else {
+			fmt.Println("invite player failed")
+		}
+	} else {
+		tick.Marget().JoinOne(p)
+		fmt.Println("player join team: ", p.id)
+	}
 	return behavior3go.SUCCESS, nil
 }
 
