@@ -19,7 +19,7 @@ func MetricsExport() *prometheus.Exporter {
 		processor.NewFactory(
 			selector.NewWithHistogramDistribution(),
 			aggregation.CumulativeTemporalitySelector(),
-			processor.WithMemory(false),
+			processor.WithMemory(true),
 		),
 		controller.WithCollectPeriod(time.Second),
 	)

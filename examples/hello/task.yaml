@@ -1,19 +1,19 @@
 plans:
 
   - treeName: subHello
-    robotNum: 2
+    robotNum: 6
     parallel: 1
 
   - treeName: subHello
-    robotNum: 3
+    robotNum: 4
     parallel: 1
   
   - treeName: subHello
-    robotNum: 2
+    robotNum: 6
     parallel: 1
 
   - treeName: subHello
-    robotNum: 3
+    robotNum: 4
     parallel: 1
 
 environments:

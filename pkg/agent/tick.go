@@ -105,6 +105,7 @@ func (h *Market) reset() {
 		h.acc <- o
 	}
 	h.hub = make(chan One, h.amount)
+	h.used = map[string]One{}
 }
 
 func (h *Market) Index() int {

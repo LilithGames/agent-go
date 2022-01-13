@@ -169,11 +169,10 @@ func pushLocalData(report *transfer.Report) error {
 }
 
 func echoLocalData(planName string, view *ViewOpt) {
-	if os.Getenv("ECHO") == "ignore" {
-		return
+	if os.Getenv("ECHO") != "ct" {
+		printQuantitySlice(planName+":H", quantities.Handler, view)
+		printQuantitySlice(planName+":E", quantities.Event, view)	
 	}
-	printQuantitySlice(planName+":H", quantities.Handler, view)
-	printQuantitySlice(planName+":E", quantities.Event, view)
 	printErrorMessage(planName+":H", quantities.Handler, view)
 	printErrorMessage(planName+":E", quantities.Handler, view)
 	quantities = newQuantities()
