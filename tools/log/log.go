@@ -2,14 +2,29 @@ package log
 
 import (
 	"bytes"
-	"go.uber.org/zap"
+	"os"
 	"runtime"
+	"time"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var zapLogger *zap.Logger
 
 func init() {
-	zapLogger, _ = zap.NewProduction(zap.AddCaller(), zap.AddCallerSkip(1))
+	zapLogger = zap.New(getCore() , zap.AddCaller(), zap.AddCallerSkip(1))
+}
+
+func getCore() zapcore.Core {
+	cfg := zap.NewProductionEncoderConfig()
+	cfg.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString(t.Format("2006-01-02T15:04:05.000"))
+	}
+	cfg.EncodeLevel = zapcore.CapitalLevelEncoder
+	level := zapcore.PanicLevel
+	level.Set(os.Getenv("logLevel"))
+	return zapcore.NewCore(zapcore.NewConsoleEncoder(cfg), zapcore.Lock(os.Stdout), level)
 }
 
 // Debug logs a message at DebugLevel. The message includes any fields passed
