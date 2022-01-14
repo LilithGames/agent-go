@@ -13,18 +13,22 @@ import (
 var zapLogger *zap.Logger
 
 func init() {
-	zapLogger = zap.New(getCore())
+	zapLogger = zap.New(getCore("fatal"))
 }
 
-func getCore() zapcore.Core {
+func ResetLogLevel(level string) {
+	zapLogger = zap.New(getCore(level))
+}
+
+func getCore(level string) zapcore.Core {
 	cfg := zap.NewProductionEncoderConfig()
 	cfg.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString(t.Format("2006-01-02T15:04:05.000"))
 	}
 	cfg.EncodeLevel = zapcore.CapitalLevelEncoder
-	level := zapcore.PanicLevel
-	level.Set(os.Getenv("logLevel"))
-	return zapcore.NewCore(zapcore.NewConsoleEncoder(cfg), zapcore.Lock(os.Stdout), level)
+	zl := zapcore.DebugLevel
+	zl.Set(level)
+	return zapcore.NewCore(zapcore.NewConsoleEncoder(cfg), zapcore.Lock(os.Stdout), zl)
 }
 
 // Debug logs a message at DebugLevel. The message includes any fields passed

@@ -9,7 +9,7 @@ import (
 	"github.com/magicsea/behavior3go"
 	"github.com/magicsea/behavior3go/core"
 	"github.com/rs/xid"
-	"log"
+	"github.com/LilithGames/agent-go/tools/log"
 	"math/rand"
 	"time"
 )
@@ -56,6 +56,10 @@ func HelloA(tick agent.Ticker) (behavior3go.Status, error) {
 	}
 	tick.Blackboard().SetMem("player", p)
 	fmt.Println("current player id: ", p.ID())
+	log.Debug("test debug log...")
+	log.Info("test info log...")
+	log.Error("test error log...")
+	log.DPanic("test panic panic...")
 	return behavior3go.SUCCESS, nil
 }
 
@@ -128,7 +132,7 @@ func buildTeam(tick agent.Ticker) (behavior3go.Status, error) {
 }
 
 func NewSubscription() core.IBaseNode {
-	subscription := agent.NewGqlSubscription(agent.WithLog(log.Println))
+	subscription := agent.NewGqlSubscription(agent.WithLog(nil))
 	return subscription
 }
 
@@ -144,7 +148,7 @@ func NewSubscriber() core.IBaseNode {
 	}
 	handler := func(tick agent.Ticker, message *json.RawMessage, err error) error {
 		if err != nil {
-			log.Println(err)
+			fmt.Println(err)
 		}
 		return err
 	}

@@ -86,24 +86,29 @@ func (m *manager) startAgentEngine(content []byte, circle bool) error {
 	if err != nil {
 		return fmt.Errorf("unmarshal envs error: %w", err)
 	}
-	for k, v := range envs {
-		os.Setenv(k, v)
-	}
+	m.setEnv(envs)
 	m.stream.setPlanCount(len(m.engine.plans), circle)
 	m.startAgentExecutors(circle)
 	return nil
 }
 
 func (m *manager) startLocalService() {
-	for k, v := range m.engine.envs {
-		os.Setenv(k, v)
-	}
+	m.setEnv(m.engine.envs)
 	var circle bool
 	if os.Getenv("mode") == "circle" {
 		circle = true
 	}
 	m.stream.setPlanCount(len(m.engine.plans), circle)
 	m.startAgentExecutors(circle)
+}
+
+func (m *manager) setEnv(envs map[string]string) {
+	for k, v := range m.engine.envs {
+		os.Setenv(k, v)
+		if k == "logLevel" && v != "" {
+			log.ResetLogLevel(v)
+		}
+	}
 }
 
 func (m *manager) startAgentExecutors(circle bool) {
