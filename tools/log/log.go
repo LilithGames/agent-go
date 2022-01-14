@@ -13,7 +13,7 @@ import (
 var zapLogger *zap.Logger
 
 func init() {
-	zapLogger = zap.New(getCore() , zap.AddCaller(), zap.AddCallerSkip(1))
+	zapLogger = zap.New(getCore())
 }
 
 func getCore() zapcore.Core {
