@@ -11,11 +11,11 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/rs/xid v1.3.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.27.0
-	go.opentelemetry.io/otel v1.2.0
-	go.opentelemetry.io/otel/exporters/prometheus v0.25.0
-	go.opentelemetry.io/otel/metric v0.25.0
-	go.opentelemetry.io/otel/sdk/export/metric v0.25.0
-	go.opentelemetry.io/otel/sdk/metric v0.25.0
+	go.opentelemetry.io/otel v1.3.0
+	go.opentelemetry.io/otel/exporters/prometheus v0.26.0
+	go.opentelemetry.io/otel/metric v0.26.0
+	go.opentelemetry.io/otel/sdk/export/metric v0.26.0
+	go.opentelemetry.io/otel/sdk/metric v0.26.0
 	go.uber.org/zap v1.19.1
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
