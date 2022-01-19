@@ -103,7 +103,7 @@ func (m *manager) startLocalService() {
 }
 
 func (m *manager) setEnv(envs map[string]string) {
-	for k, v := range m.engine.envs {
+	for k, v := range envs {
 		os.Setenv(k, v)
 		if k == "logLevel" && v != "" {
 			log.ResetLogLevel(v)
