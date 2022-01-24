@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/LilithGames/agent-go/pkg/agent"
+	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/hasura/go-graphql-client"
 	"github.com/magicsea/behavior3go"
 	"github.com/magicsea/behavior3go/core"
 	"github.com/rs/xid"
-	"github.com/LilithGames/agent-go/tools/log"
 	"math/rand"
 	"time"
 )
@@ -69,7 +69,7 @@ func HelloB(tick agent.Ticker) (behavior3go.Status, error) {
 
 func HelloC(tick agent.Ticker) (behavior3go.Status, error) {
 	p := tick.Blackboard().GetMem("player").(*Player)
-	if tick.Marget().Index() % 2 == 0 {
+	if tick.Marget().Index()%2 == 0 {
 		m := tick.Marget().InviteOne()
 		if m != nil {
 			fmt.Println("invite player success: ", m.(*Player).id)

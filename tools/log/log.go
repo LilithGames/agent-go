@@ -13,7 +13,7 @@ import (
 var zapLogger *zap.Logger
 
 func init() {
-	zapLogger = zap.New(getCore("fatal"))
+	zapLogger = zap.New(getCore("warn"))
 }
 
 func ResetLogLevel(level string) {

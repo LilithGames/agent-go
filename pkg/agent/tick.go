@@ -85,9 +85,9 @@ func (h *Market) InviteLikeOne(like func(One) bool) One {
 	return nil
 }
 
-func(h *Market) InviteAcc() One {
+func (h *Market) InviteAcc() One {
 	select {
-	case one := <- h.acc:
+	case one := <-h.acc:
 		h.UseAcc(one)
 		return one
 	case <-time.After(time.Millisecond * 10):
@@ -95,7 +95,7 @@ func(h *Market) InviteAcc() One {
 	}
 }
 
-func(h *Market) InviteOne() One {
+func (h *Market) InviteOne() One {
 	return h.InviteLikeOne(nil)
 }
 

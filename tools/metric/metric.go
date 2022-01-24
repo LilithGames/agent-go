@@ -21,9 +21,9 @@ func MetricsExport() *prometheus.Exporter {
 			aggregation.CumulativeTemporalitySelector(),
 			processor.WithMemory(true),
 		),
-		controller.WithCollectPeriod(time.Second),
+		controller.WithCollectPeriod(time.Second * 5),
 	)
-	if err := runtime.Start(runtime.WithMinimumReadMemStatsInterval(time.Second)); err != nil {
+	if err := runtime.Start(runtime.WithMinimumReadMemStatsInterval(time.Second * 5)); err != nil {
 		log.Panic("create runtime metric error", err)
 	}
 	exporter, err := prometheus.New(config, c)

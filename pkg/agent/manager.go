@@ -93,7 +93,6 @@ func (m *manager) startAgentEngine(content []byte, circle bool) error {
 }
 
 func (m *manager) startLocalService() {
-	m.setEnv(m.engine.envs)
 	var circle bool
 	if os.Getenv("mode") == "circle" {
 		circle = true
@@ -132,11 +131,11 @@ func (m *manager) buildExecutors() ([]*executor, *Market) {
 	executors := make([]*executor, len(m.engine.plans))
 	var mc int32
 	for index, plan := range m.engine.plans {
-		treeCfg := m.engine.trees[plan.TreeName]
+		treeCfg := m.engine.behavior.trees[plan.TreeName]
 		executor := &executor{
 			plan: plan,
 			treeCreator: func() *core.BehaviorTree {
-				return loader.CreateBevTreeFromConfig(&treeCfg, m.engine.registerMap)
+				return loader.CreateBevTreeFromConfig(&treeCfg, m.engine.behavior.registerMap)
 			},
 		}
 		executors[index] = executor

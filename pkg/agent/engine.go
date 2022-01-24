@@ -3,6 +3,8 @@ package agent
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/ghodss/yaml"
@@ -15,8 +17,7 @@ import (
 type Nodes map[string]core.NodeCreator
 
 type Config struct {
-	Plans        []*transfer.Plan
-	Environments map[string]string
+	Plans []*transfer.Plan
 }
 
 func (c *Config) MarshalBinary() (data []byte, err error) {
@@ -53,6 +54,16 @@ func NewBehavior() *Behavior {
 		trees:       map[string]config.BTTreeCfg{},
 		registerMap: core.NewRegisterStructMaps(),
 	}
+}
+
+func (b *Behavior) InitLocalEnvs(envs map[string]string) error {
+	for k, v := range envs {
+		err := os.Setenv(k, v)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (b *Behavior) RegisterHandler(name string, handler Handler) {
@@ -99,8 +110,7 @@ func (b *Behavior) BuildEngineFromConfig(conf []byte) *Engine {
 	if err != nil {
 		log.Panic("unmarshal plan config", zap.Error(err))
 	}
-	engine := &Engine{Behavior: b}
-	engine.envs = cfg.Environments
+	engine := &Engine{behavior: b}
 	for _, plan := range cfg.Plans {
 		if _, ok := b.trees[plan.TreeName]; !ok {
 			log.Panic("plan name not found: " + plan.TreeName)
@@ -111,9 +121,8 @@ func (b *Behavior) BuildEngineFromConfig(conf []byte) *Engine {
 	return engine
 }
 
-func (b *Behavior) BuildTestEngine(envs map[string]string, plan *transfer.Plan) *Engine {
-	engine := &Engine{Behavior: b}
-	engine.envs = envs
+func (b *Behavior) BuildEngineFromPlan(plan *transfer.Plan) *Engine {
+	engine := &Engine{behavior: b}
 	engine.plans = append(engine.plans, plan)
 	b.registerSubTreeLoadFunc()
 	return engine
@@ -130,7 +139,6 @@ func (b *Behavior) registerSubTreeLoadFunc() {
 }
 
 type Engine struct {
-	*Behavior
-	plans []*transfer.Plan
-	envs  map[string]string
+	behavior *Behavior
+	plans    []*transfer.Plan
 }
