@@ -75,7 +75,9 @@ func (n *Action) recoverPanic(name string, tick *Tick) {
 		outcome.Class = transfer.CLASS_HANDLER
 		outcome.Err = fmt.Sprintf("receive panic: %v", r)
 		tick.actorCtx().Send(tick.stat(), &outcome)
-		n.addMetric(tick.GetTree().GetTitile(), name, behavior3go.ERROR)
+		task := tick.GetTree().GetTitile()
+		n.addMetric(task, name, behavior3go.ERROR)
+		log.Error("handler panic", zap.String("handler", name), zap.String("task", task), zap.Error(fmt.Errorf("panic: %v", r)))
 	}
 }
 

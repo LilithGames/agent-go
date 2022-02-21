@@ -4,14 +4,14 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/LilithGames/agent-go/pkg/agent"
 	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/hasura/go-graphql-client"
 	"github.com/magicsea/behavior3go"
 	"github.com/magicsea/behavior3go/core"
 	"github.com/rs/xid"
-	"math/rand"
-	"time"
 )
 
 //go:embed task.yaml
@@ -64,6 +64,8 @@ func HelloA(tick agent.Ticker) (behavior3go.Status, error) {
 }
 
 func HelloB(tick agent.Ticker) (behavior3go.Status, error) {
+	time.Sleep(time.Second)
+	fmt.Println("main process...")
 	return behavior3go.SUCCESS, nil
 }
 
@@ -84,8 +86,9 @@ func HelloC(tick agent.Ticker) (behavior3go.Status, error) {
 }
 
 func HelloD(tick agent.Ticker) (behavior3go.Status, error) {
-	time.Sleep(time.Millisecond * time.Duration(rand.Intn(10)))
-	return behavior3go.SUCCESS, nil
+	time.Sleep(time.Second)
+	fmt.Println("heartbeat...")
+	return behavior3go.RUNNING, nil
 }
 
 func HelloE(tick agent.Ticker) (behavior3go.Status, error) {

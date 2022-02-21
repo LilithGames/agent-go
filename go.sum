@@ -4,8 +4,8 @@ github.com/AsynkronIT/protoactor-go v0.0.0-20211018041209-5fdd594ca443 h1:t3w3eo
 github.com/AsynkronIT/protoactor-go v0.0.0-20211018041209-5fdd594ca443/go.mod h1:/hOxjCMSgM8fEDuQeUrNvz+WWRcMosGmMJb5dm79vHU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
-github.com/LilithGames/behavior3go v1.0.2 h1:A53hDYXen/ocoXR161Xbq9tocQ32vjjztBk0IiJbwEE=
-github.com/LilithGames/behavior3go v1.0.2/go.mod h1:bqTRjmUHkU8u5UmTRzPJWkZeGRj6AJaYBlXksX5lpBc=
+github.com/LilithGames/behavior3go v1.0.3 h1:uyCJvrViEwlJQQy+9KMk43p43cbRfxA1y0uuo+zeg+4=
+github.com/LilithGames/behavior3go v1.0.3/go.mod h1:bqTRjmUHkU8u5UmTRzPJWkZeGRj6AJaYBlXksX5lpBc=
 github.com/LilithGames/go-graphql-client v1.0.4 h1:AUwNRlIBIdn4DW1dvqJgkM+mgkB1Vba6u1/TTXAW08c=
 github.com/LilithGames/go-graphql-client v1.0.4/go.mod h1:78viDEV6ew82QUorDE/bxDsdtG2QM4uqdsn5L3ROcww=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=

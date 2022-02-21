@@ -4,7 +4,7 @@
   "data": {
     "version": "0.3.0",
     "scope": "project",
-    "selectedTree": "9b312d53-62e7-40c4-800b-a5722e88ed8b",
+    "selectedTree": "5daf5bdf-0bea-45b6-bcae-0a5fd0e66181",
     "trees": [
       {
         "version": "0.3.0",
@@ -132,6 +132,24 @@
               "y": -108
             }
           },
+          "4624bd47-4cdd-4d95-8cbe-bf3217308b7f": {
+            "id": "4624bd47-4cdd-4d95-8cbe-bf3217308b7f",
+            "name": "Sequence",
+            "category": "composite",
+            "title": "Sequence",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -24,
+              "y": 24
+            },
+            "children": [
+              "87d3e037-156b-475e-b935-287a732981ae",
+              "ec58b1b2-fd58-4064-8382-96ddda694b45",
+              "3752a7e4-8211-4d53-8a4e-51721b9af7cb",
+              "67fcb644-e242-4e93-90b4-a5758fe25808"
+            ]
+          },
           "ec58b1b2-fd58-4064-8382-96ddda694b45": {
             "id": "ec58b1b2-fd58-4064-8382-96ddda694b45",
             "name": "helloC",
@@ -155,24 +173,6 @@
               "x": 204,
               "y": 48
             }
-          },
-          "4624bd47-4cdd-4d95-8cbe-bf3217308b7f": {
-            "id": "4624bd47-4cdd-4d95-8cbe-bf3217308b7f",
-            "name": "Sequence",
-            "category": "composite",
-            "title": "Sequence",
-            "description": "",
-            "properties": {},
-            "display": {
-              "x": -24,
-              "y": 24
-            },
-            "children": [
-              "87d3e037-156b-475e-b935-287a732981ae",
-              "ec58b1b2-fd58-4064-8382-96ddda694b45",
-              "3752a7e4-8211-4d53-8a4e-51721b9af7cb",
-              "67fcb644-e242-4e93-90b4-a5758fe25808"
-            ]
           },
           "67fcb644-e242-4e93-90b4-a5758fe25808": {
             "id": "67fcb644-e242-4e93-90b4-a5758fe25808",
@@ -306,32 +306,77 @@
               "y": -72
             },
             "children": [
-              "65e8cffc-e20a-46b8-86fa-7d1e39203942",
-              "2e4c4cd5-5096-42ba-97da-db592db381e0"
+              "2bc194c4-b059-4690-a4c7-86eff85dad6a"
             ]
           },
-          "65e8cffc-e20a-46b8-86fa-7d1e39203942": {
-            "id": "65e8cffc-e20a-46b8-86fa-7d1e39203942",
+          "2bc194c4-b059-4690-a4c7-86eff85dad6a": {
+            "id": "2bc194c4-b059-4690-a4c7-86eff85dad6a",
+            "name": "Parallel",
+            "category": "composite",
+            "title": "Parallel",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": -144,
+              "y": -72
+            },
+            "children": [
+              "4a9cd44e-05de-4719-82a8-3508a25184b6",
+              "8e3369d7-1349-4428-8193-e24a34108db7"
+            ]
+          },
+          "2e75e63c-251e-4d59-840c-e5ec60325be4": {
+            "id": "2e75e63c-251e-4d59-840c-e5ec60325be4",
             "name": "helloB",
             "category": "action",
             "title": "helloB",
             "description": "",
             "properties": {},
             "display": {
-              "x": -108,
-              "y": -144
+              "x": 468,
+              "y": -192
             }
           },
-          "2e4c4cd5-5096-42ba-97da-db592db381e0": {
-            "id": "2e4c4cd5-5096-42ba-97da-db592db381e0",
+          "4a9cd44e-05de-4719-82a8-3508a25184b6": {
+            "id": "4a9cd44e-05de-4719-82a8-3508a25184b6",
+            "name": "MemSequence",
+            "category": "composite",
+            "title": "MemSequence",
+            "description": "",
+            "properties": {},
+            "display": {
+              "x": 0,
+              "y": -192
+            },
+            "children": [
+              "66467819-ee0e-4fca-80db-6205cac0842c"
+            ]
+          },
+          "66467819-ee0e-4fca-80db-6205cac0842c": {
+            "id": "66467819-ee0e-4fca-80db-6205cac0842c",
+            "name": "Repeater",
+            "category": "decorator",
+            "title": "Repeat <maxLoop>x",
+            "description": "",
+            "properties": {
+              "maxLoop": 10
+            },
+            "display": {
+              "x": 204,
+              "y": -192
+            },
+            "child": "2e75e63c-251e-4d59-840c-e5ec60325be4"
+          },
+          "8e3369d7-1349-4428-8193-e24a34108db7": {
+            "id": "8e3369d7-1349-4428-8193-e24a34108db7",
             "name": "helloD",
             "category": "action",
             "title": "helloD",
             "description": "",
             "properties": {},
             "display": {
-              "x": -108,
-              "y": 0
+              "x": 60,
+              "y": 48
             }
           }
         },

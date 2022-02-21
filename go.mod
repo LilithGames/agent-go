@@ -52,5 +52,5 @@ require (
 
 replace (
 	github.com/hasura/go-graphql-client => github.com/LilithGames/go-graphql-client v1.0.4
-	github.com/magicsea/behavior3go => github.com/LilithGames/behavior3go v1.0.2
+	github.com/magicsea/behavior3go => github.com/LilithGames/behavior3go v1.0.3
 )
