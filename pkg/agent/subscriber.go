@@ -2,6 +2,7 @@ package agent
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -141,6 +142,7 @@ func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick Ticker) Messa
 				return err
 			}
 		}
+		defer g.recoverPanic(name, tick)
 		var outcome transfer.Outcome
 		start, err := strconv.ParseInt(rawMsg.Extensions.Debug.SendTime, 10, 64)
 		if err != nil {
@@ -160,6 +162,18 @@ func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick Ticker) Messa
 		}
 		tick.actorCtx().Send(tick.stat(), &outcome)
 		return err
+	}
+}
+
+func (g *GqlSubscriber) recoverPanic(name string, tick Ticker) {
+	if r := recover(); r != nil {
+		var outcome transfer.Outcome
+		outcome.Name = name
+		outcome.Class = transfer.CLASS_EVENT
+		outcome.Status = transfer.STATUS_ERROR
+		outcome.Err = fmt.Sprintf("receive panic: %v", r)
+		tick.actorCtx().Send(tick.stat(), &outcome)
+		log.Error("event panic", zap.String("event", name), zap.String("task", tick.GetTree().GetTitile()), zap.Error(fmt.Errorf("panic: %v", r)))
 	}
 }
 
