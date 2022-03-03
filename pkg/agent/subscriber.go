@@ -3,7 +3,6 @@ package agent
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -72,13 +71,9 @@ func (g *GqlSubscription) OnOpen(tick core.Ticker) {
 	}
 }
 
-func NewGqlSubscription(options ...ClientOption) *GqlSubscription {
+func NewGqlSubscription(backend string, options ...ClientOption) *GqlSubscription {
 	subscription := &GqlSubscription{}
 	subscription.ClientCreator = func() composites.SubClient {
-		backend := os.Getenv("backend")
-		if backend == "" {
-			log.Panic("graphql backend not found")
-		}
 		client := graphql.NewSubscriptionClient(backend)
 		client.WithWebSocket(newWebsocketConn)
 		if subscription.token != "" {

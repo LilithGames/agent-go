@@ -22,6 +22,7 @@ type job struct {
 	waitGroup *sync.WaitGroup
 	ctx       context.Context
 	market    *Market
+	alert     Alert
 }
 
 func newJob() *job {
@@ -53,6 +54,11 @@ func (t *job) withMarket(market *Market) *job {
 	return t
 }
 
+func (t *job) withAlert(alert Alert) *job {
+	t.alert = alert
+	return t
+}
+
 type robot struct {
 	task *job
 }
@@ -70,6 +76,7 @@ func (r *robot) execute(rootCtx *actor.RootContext) {
 	tick.ctx = r.task.ctx
 	tick.statPID = r.task.statPID
 	tick.actorRootContext = rootCtx
+	tick.alert = r.task.alert
 	var status behavior3go.Status
 	for {
 		status = r.task.tree.Tick(tick, board)

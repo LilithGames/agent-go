@@ -3,7 +3,6 @@ package agent
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
@@ -54,16 +53,6 @@ func NewBehavior() *Behavior {
 		trees:       map[string]config.BTTreeCfg{},
 		registerMap: core.NewRegisterStructMaps(),
 	}
-}
-
-func (b *Behavior) InitLocalEnvs(envs map[string]string) error {
-	for k, v := range envs {
-		err := os.Setenv(k, v)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (b *Behavior) RegisterHandler(name string, handler Handler) {

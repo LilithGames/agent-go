@@ -3,7 +3,6 @@ package agent
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"google.golang.org/grpc"
@@ -21,12 +20,16 @@ type proxyStream struct {
 	viewOpt *ViewOpt
 }
 
-func newProxyStream(client transfer.Courier_DeliverMailClient, viewOpts ...*ViewOpt) *proxyStream {
-	return &proxyStream{client: client, id: os.Getenv("ID"), viewOpt: mergeViewOpt(viewOpts...)}
-}
-
-func (s *proxyStream) withContext(ctx context.Context) {
-	s.ctx = ctx
+func newProxyFromAgent(agent *Agent, clients ...transfer.Courier_DeliverMailClient) *proxyStream {
+	proxy := &proxyStream{
+		id: agent.id,
+		viewOpt: agent.view,
+		ctx: agent.ctx,
+	}
+	if len(clients) == 1 {
+		proxy.client = clients[0]
+	}
+	return proxy
 }
 
 func (s *proxyStream) setPlanCount(count int, circle bool) {

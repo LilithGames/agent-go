@@ -3,7 +3,6 @@ package agent
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -104,7 +103,7 @@ func printErrorMessage(name string, qs map[string]*transfer.Quantity, opts ...*V
 		es := q.ErrorMap
 		for err, count := range es {
 			row := make([]string, len(header))
-			row[0] = name
+			row[0] = q.Name
 			row[1] = err
 			row[2] = strconv.Itoa(int(count))
 			table.Append(row)
@@ -169,11 +168,9 @@ func pushLocalData(report *transfer.Report) error {
 }
 
 func echoLocalData(planName string, view *ViewOpt) {
-	if os.Getenv("echo") != "ct" {
-		printQuantitySlice(planName+":H", quantities.Handler, view)
-		printQuantitySlice(planName+":E", quantities.Event, view)
-		printErrorMessage(planName+":H", quantities.Handler, view)
-		printErrorMessage(planName+":E", quantities.Event, view)
-	}
+	printQuantitySlice(planName+":H", quantities.Handler, view)
+	printQuantitySlice(planName+":E", quantities.Event, view)
+	printErrorMessage(planName+":H", quantities.Handler, view)
+	printErrorMessage(planName+":E", quantities.Event, view)
 	quantities = newQuantities()
 }

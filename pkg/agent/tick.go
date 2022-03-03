@@ -130,6 +130,7 @@ type Tick struct {
 	statPID          *actor.PID
 	recvTime         int64
 	sendTime         int64
+	alert            Alert
 }
 
 func NewTick() *Tick {
@@ -176,6 +177,13 @@ func (t *Tick) RecvTime(unixNano string) {
 
 func (t *Tick) SendTime(unixNano string) {
 	t.sendTime = strToInt64(unixNano)
+}
+
+func (t *Tick) SendAlertMsg(msg *ErrMsg) error {
+	if t.alert != nil {
+		return t.alert.SendMsg(msg)
+	}
+	return nil
 }
 
 func strToInt64(s string) int64 {

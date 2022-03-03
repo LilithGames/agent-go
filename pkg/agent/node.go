@@ -37,7 +37,7 @@ func (n *Action) OnTick(ticker core.Ticker) behavior3go.Status {
 	time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)+10))
 	name := n.GetName()
 	task := tick.GetTree().GetTitile()
-	defer n.recoverPanic(name, tick)
+	defer n.recoverPanic(tick, name)
 	var outcome transfer.Outcome
 	outcome.Class = transfer.CLASS_HANDLER
 	start := time.Now()
@@ -46,6 +46,11 @@ func (n *Action) OnTick(ticker core.Ticker) behavior3go.Status {
 	if err != nil {
 		log.Error("handler error", zap.String("handler", name), zap.String("task", task), zap.Error(err))
 		outcome.Err = err.Error()
+		msg := &ErrMsg{Name: name, Intro: "CI-Error", Detail: outcome.Err}
+		err := tick.SendAlertMsg(msg)
+		if err != nil {
+			log.Error("send alert message error: ", zap.Error(err))
+		}
 	}
 	outcome.Name = name
 	if start.UnixNano() < tick.recvTime {
@@ -67,7 +72,7 @@ func (n *Action) currentStatus(ctx context.Context, status behavior3go.Status) b
 	}
 }
 
-func (n *Action) recoverPanic(name string, tick *Tick) {
+func (n *Action) recoverPanic(tick *Tick, name string) {
 	if r := recover(); r != nil {
 		var outcome transfer.Outcome
 		outcome.Name = name
@@ -77,7 +82,13 @@ func (n *Action) recoverPanic(name string, tick *Tick) {
 		tick.actorCtx().Send(tick.stat(), &outcome)
 		task := tick.GetTree().GetTitile()
 		n.addMetric(task, name, behavior3go.ERROR)
-		log.Error("handler panic", zap.String("handler", name), zap.String("task", task), zap.Error(fmt.Errorf("panic: %v", r)))
+		detail := fmt.Sprintf("panic: %v", r)
+		log.Error("handler panic", zap.String("handler", name), zap.String("task", task), zap.Error(fmt.Errorf("%s", detail)))
+		msg := &ErrMsg{Name: name, Intro: "CI-Panic", Detail: detail}
+		err := tick.SendAlertMsg(msg)
+		if err != nil {
+			log.Error("send alert message error: ", zap.Error(err))
+		}
 	}
 }
 

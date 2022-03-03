@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/LilithGames/agent-go/pkg/agent"
-	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/hasura/go-graphql-client"
 	"github.com/magicsea/behavior3go"
 	"github.com/magicsea/behavior3go/core"
@@ -27,7 +26,8 @@ func main() {
 	behavior.RegisterNode("TestSubscriber", NewSubscriber)
 	behavior.RegisterTreeConfig(helloB3)
 	engine := behavior.BuildEngineFromConfig(task)
-	a := agent.NewAgent(engine)
+	alert := &Echo{}
+	a := agent.NewAgent(engine, nil, agent.WithAlert(alert))
 	a.Start()
 }
 
@@ -55,11 +55,6 @@ func HelloA(tick agent.Ticker) (behavior3go.Status, error) {
 		p = one.(*Player)
 	}
 	tick.Blackboard().SetMem("player", p)
-	fmt.Println("current player id: ", p.ID())
-	log.Debug("test debug log...")
-	log.Info("test info log...")
-	log.Error("test error log...")
-	log.DPanic("test panic panic...")
 	return behavior3go.SUCCESS, nil
 }
 
@@ -92,7 +87,8 @@ func HelloD(tick agent.Ticker) (behavior3go.Status, error) {
 }
 
 func HelloE(tick agent.Ticker) (behavior3go.Status, error) {
-	return behavior3go.SUCCESS, nil
+	return behavior3go.FAILURE, fmt.Errorf("test error essage")
+	// return behavior3go.SUCCESS, nil
 }
 
 func newUser(tick agent.Ticker) (behavior3go.Status, error) {
@@ -135,7 +131,7 @@ func buildTeam(tick agent.Ticker) (behavior3go.Status, error) {
 }
 
 func NewSubscription() core.IBaseNode {
-	subscription := agent.NewGqlSubscription(agent.WithLog(nil))
+	subscription := agent.NewGqlSubscription("", agent.WithLog(nil))
 	return subscription
 }
 
@@ -169,4 +165,12 @@ func NewPlayer(id string) *Player {
 
 func (p *Player) ID() string {
 	return p.id
+}
+
+type Echo struct {
+}
+
+func (e *Echo) SendMsg(msg *agent.ErrMsg) error {
+	fmt.Println(msg.Name, msg.Intro, msg.Detail, "echo alert...")
+	return nil
 }

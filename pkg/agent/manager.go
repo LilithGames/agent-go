@@ -1,40 +1,29 @@
 package agent
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"math"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
 	"github.com/magicsea/behavior3go/core"
 	"github.com/magicsea/behavior3go/loader"
 	"go.uber.org/zap"
-	"io"
-	"math"
-	"os"
-	"strconv"
-	"sync"
-	"time"
 )
 
 type manager struct {
-	engine *Engine
-	stream *proxyStream
-	ctx    context.Context
-	cancel context.CancelFunc
+	*Agent
 }
 
-func newManager(engine *Engine, stream *proxyStream) *manager {
-	ctx, cancel := context.WithCancel(context.Background())
-	stream.withContext(ctx)
-	return &manager{
-		engine: engine,
-		stream: stream,
-		ctx:    ctx,
-		cancel: cancel,
-	}
+func newManagerFromAgent(agent *Agent) *manager {
+	return &manager{agent}
 }
 
 func (m *manager) startClusterService() {
@@ -94,7 +83,7 @@ func (m *manager) startAgentEngine(content []byte, circle bool) error {
 
 func (m *manager) startLocalService() {
 	var circle bool
-	if os.Getenv("mode") == "circle" {
+	if m.cfg.GetString("mode") == "circle" {
 		circle = true
 	}
 	m.stream.setPlanCount(len(m.engine.plans), circle)
@@ -103,7 +92,7 @@ func (m *manager) startLocalService() {
 
 func (m *manager) setEnv(envs map[string]string) {
 	for k, v := range envs {
-		os.Setenv(k, v)
+		m.cfg.Set(k, v)
 		if k == "logLevel" && v != "" {
 			log.ResetLogLevel(v)
 		}
@@ -164,7 +153,8 @@ func (m *manager) startExecutor(executor *executor, market *Market) {
 			withWaitGroup(wg).
 			withStatPID(actuaryID).
 			withBeTree(executor.treeCreator()).
-			withMarket(market)
+			withMarket(market).
+			withAlert(m.alert)
 		if i%parallel == 0 && i/parallel > 0 {
 			<-ticker.C
 		}
@@ -180,7 +170,7 @@ func (m *manager) startExecutor(executor *executor, market *Market) {
 
 func (m *manager) getParallel() int {
 	var rs int
-	pe := os.Getenv("parallel")
+	pe := m.cfg.GetString("parallel")
 	if pe != "" {
 		rs, _ = strconv.Atoi(pe)
 		return rs
@@ -190,5 +180,5 @@ func (m *manager) getParallel() int {
 			rs = int(plan.Parallel)
 		}
 	}
-	return math.MaxInt16
+	return math.MaxInt8
 }

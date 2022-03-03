@@ -2,10 +2,11 @@ package agent
 
 import (
 	"context"
-	"github.com/LilithGames/agent-go/tools/metric"
 	"net/http"
-	"os"
 	"strconv"
+
+	"github.com/LilithGames/agent-go/tools/metric"
+	"github.com/spf13/viper"
 
 	"github.com/LilithGames/agent-go/pkg/transfer"
 	"github.com/LilithGames/agent-go/tools/log"
@@ -18,22 +19,39 @@ import (
 const masterAddr = "MASTER_ADDR"
 
 type Agent struct {
+	id       string
+	ctx      context.Context
+	cancel   context.CancelFunc
 	engine   *Engine
+	cfg      *viper.Viper
 	endpoint string
-	opt      *AgentOpt
+	view     *ViewOpt
+	alert    Alert
+	stream    *proxyStream
 }
 
-func IsTestMode() bool {
-	endpoint := os.Getenv(masterAddr)
-	return endpoint == ""
-}
-
-func NewAgent(engine *Engine, opts ...*AgentOpt) *Agent {
+func NewAgent(engine *Engine, cfg *viper.Viper, opts ...Option) *Agent {
 	if len(engine.plans) == 0 {
 		log.Panic("absent plans")
 	}
-	endpoint := os.Getenv(masterAddr)
-	return &Agent{engine: engine, endpoint: endpoint, opt: mergeAgentOpt(opts...)}
+	if cfg == nil {
+		cfg = viper.New()
+	}
+	id := cfg.GetString("ID")
+	endpoint := cfg.GetString(masterAddr)
+	ctx, cancel := context.WithCancel(context.Background())
+	at := &Agent{
+		id:id, 
+		ctx: ctx,
+		cancel: cancel,
+		engine: engine, 
+		cfg: cfg, 
+		endpoint: endpoint,
+	}
+	for _, opt := range opts {
+		opt(at)
+	}
+	return at
 }
 
 func (a *Agent) Start() {
@@ -46,8 +64,8 @@ func (a *Agent) Start() {
 }
 
 func (a *Agent) startDefaultAgent() {
-	c := newProxyStream(nil, a.opt.getView())
-	newManager(a.engine, c).startLocalService()
+	a.stream = newProxyFromAgent(a)
+	newManagerFromAgent(a).startLocalService()
 }
 
 func (a *Agent) startClusterAgent() {
@@ -58,8 +76,8 @@ func (a *Agent) startClusterAgent() {
 	if err != nil {
 		log.Panic("request grpc courier error", zap.Error(err))
 	}
-	var c = newProxyStream(client, a.opt.getView())
-	newManager(a.engine, c).startClusterService()
+	a.stream = newProxyFromAgent(a, client)
+	newManagerFromAgent(a).startClusterService()
 }
 
 func (a *Agent) dialMaster() *grpc.ClientConn {
@@ -80,7 +98,7 @@ func (a *Agent) newOutgoingContext() context.Context {
 		}
 	}
 	robotNum := strconv.Itoa(int(rc))
-	data := map[string]string{"agentID": agentID, "ID": os.Getenv("ID"), "robotNum": robotNum}
+	data := map[string]string{"agentID": agentID, "ID": a.id, "robotNum": robotNum}
 	return metadata.NewOutgoingContext(context.Background(), metadata.New(data))
 }
 

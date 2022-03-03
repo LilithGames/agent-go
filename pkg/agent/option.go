@@ -1,6 +1,11 @@
 package agent
 
-import "github.com/olekukonko/tablewriter"
+import (
+	"fmt"
+
+	"github.com/olekukonko/tablewriter"
+	"github.com/spf13/viper"
+)
 
 type ViewOpt struct {
 	tableApply []func(*tablewriter.Table)
@@ -36,27 +41,37 @@ func ViewColWidth(v int) *ViewOpt {
 	}
 }
 
-type AgentOpt struct {
-	view *ViewOpt
+type ErrMsg struct {
+	Name   string `json:"name,omitempty"`
+	Intro  string `json:"intro,omitempty"`
+	Detail string `json:"detail,omitempty"`
 }
 
-func AgentViewOpt(opts ...*ViewOpt) *AgentOpt {
-	return &AgentOpt{
-		view: mergeViewOpt(opts...),
+func (e *ErrMsg) Error() string {
+	return fmt.Sprintf("name: %s, intro: %s, detail: %s", e.Name, e.Intro, e.Detail)
+}
+
+type Alert interface {
+	SendMsg(msg *ErrMsg) error
+}
+
+type Option func(agent *Agent)
+
+func WithAlert(alert Alert) Option {
+	return func(agent *Agent) {
+		agent.alert = alert
+	}	
+}
+
+func WithConfig(cfg *viper.Viper) Option {
+	return func(agent *Agent) {
+		agent.cfg = cfg
 	}
 }
 
-func (o *AgentOpt) getView() *ViewOpt {
-	return o.view
-}
-
-func mergeAgentOpt(opts ...*AgentOpt) *AgentOpt {
-	res := &AgentOpt{}
-	for _, opt := range opts {
-		if opt == nil {
-			continue
-		}
-		res.view = mergeViewOpt(res.view, opt.view)
+func WithViewer(views ...*ViewOpt) Option {
+	view := mergeViewOpt(views...)
+	return func(agent *Agent) {
+		agent.view = view
 	}
-	return res
 }
