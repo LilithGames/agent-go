@@ -87,7 +87,7 @@ func HelloD(tick agent.Ticker) (behavior3go.Status, error) {
 }
 
 func HelloE(tick agent.Ticker) (behavior3go.Status, error) {
-	return behavior3go.FAILURE, fmt.Errorf("test error essage")
+	return behavior3go.FAILURE, fmt.Errorf("test error essage.##")
 	// return behavior3go.SUCCESS, nil
 }
 

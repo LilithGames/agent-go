@@ -36,6 +36,12 @@ message EventReply {
   repeated PlanReply replies = 3;
 }
 
+message ErrorMark {
+  string depiction = 1;
+  int64 frequency = 2; 
+  repeated string traces = 3;
+}
+
 message Quantity {
   string name = 1;
   int64 totalNum = 2;
@@ -51,7 +57,7 @@ message Quantity {
   int64 le2s = 12;
   int64 le5s = 13;
   int64 le10s = 14;
-  map<string, int64> errorMap = 15;
+  map<string, ErrorMark> errorMap = 15;
   CLASS class = 16;
 }
 

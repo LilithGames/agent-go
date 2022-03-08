@@ -20,7 +20,7 @@ func init() {
 
 func newQuantity(name string, class transfer.CLASS) *transfer.Quantity {
 	var q transfer.Quantity
-	q.ErrorMap = make(map[string]int64)
+	q.ErrorMap = make(map[string]*transfer.ErrorMark)
 	q.Name = name
 	q.Class = class
 	return &q
@@ -97,15 +97,16 @@ func printErrorMessage(name string, qs map[string]*transfer.Quantity, opts ...*V
 	buf := bytes.NewBuffer(nil)
 	table := tablewriter.NewWriter(buf)
 	opt.apply(table)
-	header := []string{"Name", "Reason", "Count"}
+	header := []string{"Name", "Reason", "Count", "Trace"}
 	table.SetHeader(header)
 	for _, q := range qs {
 		es := q.ErrorMap
-		for err, count := range es {
+		for _, em := range es {
 			row := make([]string, len(header))
 			row[0] = q.Name
-			row[1] = err
-			row[2] = strconv.Itoa(int(count))
+			row[1] = em.Depiction
+			row[2] = strconv.Itoa(int(em.Frequency))
+			row[3] = strings.Join(em.Traces, ";")
 			table.Append(row)
 		}
 	}
@@ -157,9 +158,36 @@ func pushData(outcomes []*transfer.Outcome) {
 			q.ErrorNum++
 		}
 		if outcome.Err != "" {
-			q.ErrorMap[outcome.Err]++
+			pushError(q.ErrorMap, outcome.Err)
 		}
 	}
+}
+
+func pushError(errors map[string]*transfer.ErrorMark, err string) {
+	last := strings.LastIndex(err, "#")
+	first := strings.Index(err, "#")
+	var depiction, trace string 
+	if first != last && first != -1 && last != -1 {
+		trace = err[first+1:last]
+		depiction = err[:first]
+	} else {
+		depiction, trace = err, ""
+	}
+	if em, ok := errors[depiction]; ok {
+		em.Frequency++
+		if len(em.Traces) < 5 && trace != "" {
+			em.Traces = append(em.Traces, trace)
+		}
+		return
+	}
+	em := &transfer.ErrorMark{
+		Depiction: depiction,
+		Frequency: 1,
+	}
+	if trace != "" && len(em.Traces) < 5 {
+		em.Traces = append(em.Traces, trace)
+	}
+	errors[depiction] = em
 }
 
 func pushLocalData(report *transfer.Report) error {
