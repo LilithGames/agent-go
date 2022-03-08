@@ -37,7 +37,7 @@ func NewAgent(engine *Engine, cfg *viper.Viper, opts ...Option) *Agent {
 		log.Panic("absent plans")
 	}
 	if cfg == nil {
-		cfg := viper.New()
+		cfg = viper.New()
 		cfg.SetConfigType("prop")
 		envs := os.Environ()
 		for _, env := range envs {
