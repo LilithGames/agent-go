@@ -3,7 +3,9 @@ package agent
 import (
 	"context"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 
 	"github.com/LilithGames/agent-go/tools/metric"
 	"github.com/spf13/viper"
@@ -35,7 +37,15 @@ func NewAgent(engine *Engine, cfg *viper.Viper, opts ...Option) *Agent {
 		log.Panic("absent plans")
 	}
 	if cfg == nil {
-		cfg = viper.New()
+		cfg := viper.New()
+		cfg.SetConfigType("prop")
+		envs := os.Environ()
+		for _, env := range envs {
+			parts := strings.SplitN(env, "=", 2)
+			if len(parts) == 2 {
+				cfg.Set(parts[0], parts[1])
+			}
+		}
 	}
 	id := cfg.GetString("ID")
 	endpoint := cfg.GetString(masterAddr)
