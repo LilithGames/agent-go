@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"log"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -146,6 +147,7 @@ func (t *Tick) Tear(ticker core.Ticker) {
 	tick.ctx = t.ctx
 	tick.statPID = t.statPID
 	tick.actorRootContext = t.actorRootContext
+	tick.alert = t.alert
 	t.Tick.Tear(&tick.Tick)
 }
 
@@ -183,6 +185,7 @@ func (t *Tick) SendAlertMsg(msg *ErrMsg) error {
 	if t.alert != nil {
 		return t.alert.SendMsg(msg)
 	}
+	log.Println("alert object is nil...")
 	return nil
 }
 

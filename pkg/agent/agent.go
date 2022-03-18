@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	_ "net/http/pprof"
 
 	"github.com/LilithGames/agent-go/tools/metric"
 	"github.com/spf13/viper"
