@@ -22,9 +22,9 @@ type proxyStream struct {
 
 func newProxyFromAgent(agent *Agent, clients ...transfer.Courier_DeliverMailClient) *proxyStream {
 	proxy := &proxyStream{
-		id: agent.id,
+		id:      agent.id,
 		viewOpt: agent.view,
-		ctx: agent.ctx,
+		ctx:     agent.ctx,
 	}
 	if len(clients) == 1 {
 		proxy.client = clients[0]

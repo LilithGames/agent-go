@@ -1,6 +1,6 @@
 module github.com/LilithGames/agent-go
 
-go 1.17
+go 1.18
 
 require (
 	github.com/AsynkronIT/protoactor-go v0.0.0-20211018041209-5fdd594ca443
@@ -64,5 +64,5 @@ require (
 
 replace (
 	github.com/hasura/go-graphql-client => github.com/LilithGames/go-graphql-client v1.0.4
-	github.com/magicsea/behavior3go => github.com/LilithGames/behavior3go v1.0.3
+	github.com/magicsea/behavior3go => github.com/LilithGames/behavior3go v1.0.4
 )

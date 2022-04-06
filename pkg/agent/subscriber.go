@@ -17,45 +17,58 @@ import (
 	"go.uber.org/zap"
 )
 
-type ClientOption func(client *graphql.SubscriptionClient)
+type NewClientOption func(client *graphql.SubscriptionClient, tick core.Ticker)
 
 type MessageCallback func(tick Ticker, message *json.RawMessage, err error) error
 
 type MessageHandler func(message *json.RawMessage, err error) error
 
-func WithLog(log func(args ...interface{})) ClientOption {
-	return func(client *graphql.SubscriptionClient) {
+func WithLog(log func(args ...interface{})) NewClientOption {
+	return func(client *graphql.SubscriptionClient, _ core.Ticker) {
 		client.WithLog(log)
 	}
 }
 
-func WithOnErr(onError func(sc *graphql.SubscriptionClient, err error) error) ClientOption {
-	return func(client *graphql.SubscriptionClient) {
+func WithOnErr(onError func(sc *graphql.SubscriptionClient, err error) error) NewClientOption {
+	return func(client *graphql.SubscriptionClient, _ core.Ticker) {
 		client.OnError(onError)
 	}
 }
 
-func WithOnConnected(fn func()) ClientOption {
-	return func(client *graphql.SubscriptionClient) {
+func WithOnConnected(fn func()) NewClientOption {
+	return func(client *graphql.SubscriptionClient, _ core.Ticker) {
 		client.OnConnected(fn)
 	}
 }
 
-func WithOnDisconnected(fn func()) ClientOption {
-	return func(client *graphql.SubscriptionClient) {
+func WithOnDisconnected(fn func()) NewClientOption {
+	return func(client *graphql.SubscriptionClient, _ core.Ticker) {
 		client.OnDisconnected(fn)
 	}
 }
 
-func WithoutLogTypes(types ...graphql.OperationMessageType) ClientOption {
-	return func(client *graphql.SubscriptionClient) {
+func WithoutLogTypes(types ...graphql.OperationMessageType) NewClientOption {
+	return func(client *graphql.SubscriptionClient, _ core.Ticker) {
 		client.WithoutLogTypes(types...)
 	}
 }
 
-func WithTimeout(timeout time.Duration) ClientOption {
-	return func(client *graphql.SubscriptionClient) {
+func WithTimeout(timeout time.Duration) NewClientOption {
+	return func(client *graphql.SubscriptionClient, _ core.Ticker) {
 		client.WithTimeout(timeout)
+	}
+}
+
+func WithNothing() NewClientOption {
+	return func(_ *graphql.SubscriptionClient, _ core.Ticker) {}
+}
+
+type InitFunction func(tick core.Ticker) NewClientOption
+
+func WithInitFunc(init InitFunction) NewClientOption {
+	return func(client *graphql.SubscriptionClient, tick core.Ticker) {
+		option := init(tick)
+		option(client, tick)
 	}
 }
 
@@ -71,9 +84,9 @@ func (g *GqlSubscription) OnOpen(tick core.Ticker) {
 	}
 }
 
-func NewGqlSubscription(backend string, options ...ClientOption) *GqlSubscription {
+func NewGraphqlSubscription(backend string, options ...NewClientOption) *GqlSubscription {
 	subscription := &GqlSubscription{}
-	subscription.ClientCreator = func() composites.SubClient {
+	subscription.ClientCreator = func(tick core.Ticker) composites.SubClient {
 		client := graphql.NewSubscriptionClient(backend)
 		client.WithWebSocket(newWebsocketConn)
 		if subscription.token != "" {
@@ -82,7 +95,7 @@ func NewGqlSubscription(backend string, options ...ClientOption) *GqlSubscriptio
 			})
 		}
 		for _, option := range options {
-			option(client)
+			option(client, tick)
 		}
 		return client
 	}

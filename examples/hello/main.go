@@ -131,7 +131,7 @@ func buildTeam(tick agent.Ticker) (behavior3go.Status, error) {
 }
 
 func NewSubscription() core.IBaseNode {
-	subscription := agent.NewGqlSubscription("", agent.WithLog(nil))
+	subscription := agent.NewGraphqlSubscription("", agent.WithLog(nil))
 	return subscription
 }
 

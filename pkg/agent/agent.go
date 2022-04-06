@@ -3,10 +3,10 @@ package agent
 import (
 	"context"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"strings"
-	_ "net/http/pprof"
 
 	"github.com/LilithGames/agent-go/tools/metric"
 	"github.com/spf13/viper"
@@ -30,7 +30,7 @@ type Agent struct {
 	endpoint string
 	view     *ViewOpt
 	alert    Alert
-	stream    *proxyStream
+	stream   *proxyStream
 }
 
 func NewAgent(engine *Engine, cfg *viper.Viper, opts ...Option) *Agent {
@@ -52,11 +52,11 @@ func NewAgent(engine *Engine, cfg *viper.Viper, opts ...Option) *Agent {
 	endpoint := cfg.GetString(masterAddr)
 	ctx, cancel := context.WithCancel(context.Background())
 	at := &Agent{
-		id:id, 
-		ctx: ctx,
-		cancel: cancel,
-		engine: engine, 
-		cfg: cfg, 
+		id:       id,
+		ctx:      ctx,
+		cancel:   cancel,
+		engine:   engine,
+		cfg:      cfg,
 		endpoint: endpoint,
 	}
 	for _, opt := range opts {

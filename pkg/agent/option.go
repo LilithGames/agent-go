@@ -60,7 +60,7 @@ type Option func(agent *Agent)
 func WithAlert(alert Alert) Option {
 	return func(agent *Agent) {
 		agent.alert = alert
-	}	
+	}
 }
 
 func WithConfig(cfg *viper.Viper) Option {

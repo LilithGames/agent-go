@@ -166,9 +166,9 @@ func pushData(outcomes []*transfer.Outcome) {
 func pushError(errors map[string]*transfer.ErrorMark, err string) {
 	last := strings.LastIndex(err, "#")
 	first := strings.Index(err, "#")
-	var depiction, trace string 
+	var depiction, trace string
 	if first != last && first != -1 && last != -1 {
-		trace = err[first+1:last]
+		trace = err[first+1 : last]
 		depiction = err[:first]
 	} else {
 		depiction, trace = err, ""
