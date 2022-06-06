@@ -12,6 +12,29 @@ import (
 	"github.com/magicsea/behavior3go/core"
 )
 
+type Signal struct {
+	market   *Market
+	terminal chan interface{}
+}
+
+func newSignal(m *Market) *Signal {
+	terminal := make(chan interface{})
+	return &Signal{terminal: terminal, market: m}
+}
+
+func (s *Signal) Wait() {
+	<-s.terminal
+}
+
+func (s *Signal) Close() {
+	close(s.terminal)
+	s.market.releaseSeat()
+}
+
+func (s *Signal) Slave() <-chan One {
+	return s.market.getSlave()
+}
+
 type One interface {
 	ID() string
 }
@@ -20,8 +43,11 @@ type Market struct {
 	idx    int64
 	hub    chan One
 	acc    chan One
+	master chan One
+	slave  chan One
 	amount int
 	used   map[string]One
+	signal *Signal
 	sync.Mutex
 }
 
@@ -32,6 +58,8 @@ func newMarket(amount int) *Market {
 		hub:    make(chan One, amount),
 		acc:    make(chan One, amount),
 		used:   make(map[string]One),
+		master: make(chan One, 1),
+		slave:  make(chan One, 0),
 	}
 }
 
@@ -100,6 +128,29 @@ func (h *Market) InviteOne() One {
 	return h.InviteLikeOne(nil)
 }
 
+func (h *Market) GrabSeat(one One) (*Signal, bool) {
+	select {
+	case h.master <- one:
+		h.signal = newSignal(h)
+		return h.signal, true
+	case h.slave <- one:
+		return h.signal, false
+	}
+}
+
+func (h *Market) releaseSeat() bool {
+	select {
+	case <-h.master:
+		return true
+	default:
+		return false
+	}
+}
+
+func (h *Market) getSlave() <-chan One {
+	return h.slave
+}
+
 func (h *Market) reset() {
 	h.idx = 0
 	for _, o := range h.used {
@@ -107,6 +158,8 @@ func (h *Market) reset() {
 	}
 	h.hub = make(chan One, h.amount)
 	h.used = map[string]One{}
+	h.master = make(chan One, 1)
+	h.slave = make(chan One, 0)
 }
 
 func (h *Market) Index() int {
