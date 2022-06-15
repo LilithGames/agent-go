@@ -168,7 +168,7 @@ func (h *Market) Index() int {
 
 type Ticker interface {
 	core.Ticker
-	Marget() *Market
+	Market() *Market
 	context() context.Context
 	stat() *actor.PID
 	actorCtx() *actor.RootContext
@@ -210,7 +210,7 @@ func (t *Tick) TearTick() core.Ticker {
 	return tick
 }
 
-func (t *Tick) Marget() *Market {
+func (t *Tick) Market() *Market {
 	return t.market
 }
 
