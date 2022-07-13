@@ -35,6 +35,15 @@ func (s *Signal) Slave() <-chan One {
 	return s.market.getSlave()
 }
 
+type ParamNotFound struct {
+}
+
+func (p ParamNotFound) Error() string {
+	return "NotFoundParam"
+}
+
+var paramError = ParamNotFound{}
+
 type One interface {
 	ID() string
 }
@@ -174,6 +183,10 @@ type Ticker interface {
 	actorCtx() *actor.RootContext
 	RecvTime(unixNano string)
 	SendTime(unixNano string)
+	GetParamInt(key string) (int, error)
+	GetParamBool(key string) (bool, error)
+	GetParamFloat(key string) (float64, error)
+	GetParamString(key string) (string, error)
 }
 
 type Tick struct {
@@ -240,6 +253,66 @@ func (t *Tick) SendAlertMsg(msg *ErrMsg) error {
 	}
 	log.Println("alert object is nil...")
 	return nil
+}
+
+func (t *Tick) GetParamString(key string) (string, error) {
+	val := t.Blackboard().GetMem(key)
+	if val == nil {
+		return "", paramError
+	}
+	rs, ok := val.(string)
+	if !ok {
+		return "", paramError
+	}
+	return rs, nil
+}
+
+func (t *Tick) GetParamInt(key string) (int, error) {
+	val := t.Blackboard().GetMem(key)
+	if val == nil {
+		return 0, paramError
+	}
+	str, ok := val.(string)
+	if !ok {
+		return 0, paramError
+	}
+	num, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, err
+	}
+	return num, nil
+}
+
+func (t *Tick) GetParamBool(key string) (bool, error) {
+	val := t.Blackboard().GetMem(key)
+	if val == nil {
+		return false, paramError	
+	}
+	str, ok := val.(string)
+	if !ok {
+		return false, paramError
+	} 
+	rs, err := strconv.ParseBool(str)
+	if err != nil {
+		return false, err
+	}
+	return rs, nil
+}
+
+func (t *Tick) GetParamFloat(key string) (float64, error) {
+	val := t.Blackboard().GetMem(key)
+	if val == nil {
+		return 0, paramError
+	}
+	str, ok := val.(string)
+	if !ok {
+		return 0, paramError
+	}
+	rs, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		return 0, err
+	}
+	return rs, nil
 }
 
 func strToInt64(s string) int64 {

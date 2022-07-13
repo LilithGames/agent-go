@@ -11,6 +11,7 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
+// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // CourierClient is the client API for Courier service.
@@ -29,7 +30,7 @@ func NewCourierClient(cc grpc.ClientConnInterface) CourierClient {
 }
 
 func (c *courierClient) DeliverMail(ctx context.Context, opts ...grpc.CallOption) (Courier_DeliverMailClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Courier_serviceDesc.Streams[0], "/Courier/DeliverMail", opts...)
+	stream, err := c.cc.NewStream(ctx, &Courier_ServiceDesc.Streams[0], "/Courier/DeliverMail", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ type UnsafeCourierServer interface {
 }
 
 func RegisterCourierServer(s grpc.ServiceRegistrar, srv CourierServer) {
-	s.RegisterService(&_Courier_serviceDesc, srv)
+	s.RegisterService(&Courier_ServiceDesc, srv)
 }
 
 func _Courier_DeliverMail_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -113,7 +114,10 @@ func (x *courierDeliverMailServer) Recv() (*Mail, error) {
 	return m, nil
 }
 
-var _Courier_serviceDesc = grpc.ServiceDesc{
+// Courier_ServiceDesc is the grpc.ServiceDesc for Courier service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Courier_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "Courier",
 	HandlerType: (*CourierServer)(nil),
 	Methods:     []grpc.MethodDesc{},

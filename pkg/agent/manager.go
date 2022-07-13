@@ -154,7 +154,8 @@ func (m *manager) startExecutor(executor *executor, market *Market) {
 			withStatPID(actuaryID).
 			withBeTree(executor.treeCreator()).
 			withMarket(market).
-			withAlert(m.alert)
+			withAlert(m.alert).
+			withParams(executor.plan.Params)
 		if i%parallel == 0 && i/parallel > 0 {
 			<-ticker.C
 		}

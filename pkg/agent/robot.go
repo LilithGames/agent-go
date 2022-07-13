@@ -23,6 +23,7 @@ type job struct {
 	ctx       context.Context
 	market    *Market
 	alert     Alert
+	params    map[string]string
 }
 
 func newJob() *job {
@@ -59,6 +60,19 @@ func (t *job) withAlert(alert Alert) *job {
 	return t
 }
 
+func (t *job) withParams(params map[string]string) *job {
+	t.params = params
+	return t
+}
+
+func (t *job) newBoard() *core.Blackboard {
+	board := core.NewBlackboard()
+	for key, val := range t.params {
+		board.SetMem(key, val)
+	}
+	return board
+}
+
 type robot struct {
 	task *job
 }
@@ -70,7 +84,7 @@ func newRobot(j *job) *robot {
 func (r *robot) execute(rootCtx *actor.RootContext) {
 	start := time.Now()
 	outcome := transfer.Outcome{Name: "whole_process"}
-	board := core.NewBlackboard()
+	board := r.task.newBoard()
 	tick := NewTick()
 	tick.market = r.task.market
 	tick.ctx = r.task.ctx

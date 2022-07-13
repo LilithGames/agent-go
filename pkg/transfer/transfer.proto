@@ -21,6 +21,7 @@ message Plan {
   int32 robotNum = 2;
   int32 parallel = 3;
   int32 interval = 4;
+  map<string, string> params = 5;
 }
 
 message Event {

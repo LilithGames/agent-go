@@ -46,10 +46,10 @@ func HelloHandlers() agent.Handlers {
 
 func HelloA(tick agent.Ticker) (behavior3go.Status, error) {
 	var p *Player
-	one := tick.Marget().InviteAcc()
+	one := tick.Market().InviteAcc()
 	if one == nil {
 		p = NewPlayer(xid.New().String())
-		tick.Marget().UseAcc(p)
+		tick.Market().UseAcc(p)
 		fmt.Println("new player id", p.ID())
 	} else {
 		p = one.(*Player)
@@ -66,15 +66,15 @@ func HelloB(tick agent.Ticker) (behavior3go.Status, error) {
 
 func HelloC(tick agent.Ticker) (behavior3go.Status, error) {
 	p := tick.Blackboard().GetMem("player").(*Player)
-	if tick.Marget().Index()%2 == 0 {
-		m := tick.Marget().InviteOne()
+	if tick.Market().Index()%2 == 0 {
+		m := tick.Market().InviteOne()
 		if m != nil {
 			fmt.Println("invite player success: ", m.(*Player).id)
 		} else {
 			fmt.Println("invite player failed")
 		}
 	} else {
-		tick.Marget().JoinOne(p)
+		tick.Market().JoinOne(p)
 		fmt.Println("player join team: ", p.id)
 	}
 	return behavior3go.SUCCESS, nil
@@ -93,14 +93,14 @@ func HelloE(tick agent.Ticker) (behavior3go.Status, error) {
 
 func newUser(tick agent.Ticker) (behavior3go.Status, error) {
 	player := NewPlayer(xid.New().String())
-	tick.Marget().PushOne(player)
+	tick.Market().PushOne(player)
 	tick.Blackboard().SetMem("userId", player.id)
 	return behavior3go.SUCCESS, nil
 }
 
 func addFriend(tick agent.Ticker) (behavior3go.Status, error) {
 	userID := tick.Blackboard().GetMem("userId").(string)
-	one := tick.Marget().RequireOne(func(one agent.One) bool {
+	one := tick.Market().RequireOne(func(one agent.One) bool {
 		player := one.(*Player)
 		return player.ID() != userID
 	})
@@ -114,12 +114,12 @@ func addFriend(tick agent.Ticker) (behavior3go.Status, error) {
 }
 
 func buildTeam(tick agent.Ticker) (behavior3go.Status, error) {
-	index := tick.Marget().Index()
+	index := tick.Market().Index()
 	userID := tick.Blackboard().GetMem("userId").(string)
 	if index%2 == 1 {
-		tick.Marget().JoinOne(NewPlayer(userID))
+		tick.Market().JoinOne(NewPlayer(userID))
 	} else {
-		one := tick.Marget().InviteOne()
+		one := tick.Market().InviteOne()
 		if one == nil {
 			fmt.Println("no found player to build team")
 		} else {
