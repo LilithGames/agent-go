@@ -83,7 +83,7 @@ func (m *manager) startAgentEngine(content []byte, circle bool) error {
 
 func (m *manager) startLocalService() {
 	var circle bool
-	if m.cfg.GetString("mode") == "circle" {
+	if m.variable.GetString("mode") == "circle" {
 		circle = true
 	}
 	m.stream.setPlanCount(len(m.engine.plans), circle)
@@ -92,7 +92,7 @@ func (m *manager) startLocalService() {
 
 func (m *manager) setEnv(envs map[string]string) {
 	for k, v := range envs {
-		m.cfg.Set(k, v)
+		m.variable.Set(k, v)
 		if k == "logLevel" && v != "" {
 			log.ResetLogLevel(v)
 		}
@@ -171,7 +171,7 @@ func (m *manager) startExecutor(executor *executor, market *Market) {
 
 func (m *manager) getParallel() int {
 	var rs int
-	pe := m.cfg.GetString("parallel")
+	pe := m.variable.GetString("parallel")
 	if pe != "" {
 		rs, _ = strconv.Atoi(pe)
 		return rs

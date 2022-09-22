@@ -167,8 +167,7 @@ func (p *Player) ID() string {
 	return p.id
 }
 
-type Echo struct {
-}
+type Echo struct{}
 
 func (e *Echo) SendMsg(msg *agent.ErrMsg) error {
 	fmt.Println(msg.Name, msg.Intro, msg.Detail, "echo alert...")

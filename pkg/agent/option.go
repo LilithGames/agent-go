@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/spf13/viper"
 )
 
 type ViewOpt struct {
@@ -60,12 +59,6 @@ type Option func(agent *Agent)
 func WithAlert(alert Alert) Option {
 	return func(agent *Agent) {
 		agent.alert = alert
-	}
-}
-
-func WithConfig(cfg *viper.Viper) Option {
-	return func(agent *Agent) {
-		agent.cfg = cfg
 	}
 }
 

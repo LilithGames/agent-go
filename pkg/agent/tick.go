@@ -35,8 +35,7 @@ func (s *Signal) Slave() <-chan One {
 	return s.market.getSlave()
 }
 
-type ParamNotFound struct {
-}
+type ParamNotFound struct{}
 
 func (p ParamNotFound) Error() string {
 	return "NotFoundParam"
@@ -286,12 +285,12 @@ func (t *Tick) GetParamInt(key string) (int, error) {
 func (t *Tick) GetParamBool(key string) (bool, error) {
 	val := t.Blackboard().GetMem(key)
 	if val == nil {
-		return false, paramError	
+		return false, paramError
 	}
 	str, ok := val.(string)
 	if !ok {
 		return false, paramError
-	} 
+	}
 	rs, err := strconv.ParseBool(str)
 	if err != nil {
 		return false, err

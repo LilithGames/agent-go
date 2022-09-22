@@ -15,6 +15,7 @@ type proxyStream struct {
 	index   int
 	count   int
 	circle  bool
+	hasErr  bool
 	id      string
 	client  transfer.Courier_DeliverMailClient
 	viewOpt *ViewOpt
@@ -40,6 +41,7 @@ func (s *proxyStream) setPlanCount(count int, circle bool) {
 
 func (s *proxyStream) finishPlan(planName string) error {
 	if s.client == nil {
+		s.hasErr = hasLocalError()
 		echoLocalData(planName, s.viewOpt)
 	}
 	select {
@@ -93,4 +95,11 @@ func (s *proxyStream) Recv() (*transfer.Mail, error) {
 
 func (s *proxyStream) formatPlanID(planName string) string {
 	return fmt.Sprintf("%s-%d-%s", s.id, s.index, planName)
+}
+
+func (s *proxyStream) checkResult() error {
+	if s.hasErr {
+		return fmt.Errorf("Test Failed")
+	}
+	return nil
 }

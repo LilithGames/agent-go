@@ -44,7 +44,7 @@ func printQuantitySlice(name string, qs map[string]*transfer.Quantity, opts ...*
 	header := []string{"Name", "Total", "Fail", " 0~50MS", "50~100MS", "100~200MS", "200~500MS", "500~1S", "1~2S", "2~5S", "5~10S"}
 	table.SetHeader(header)
 	names := make([]string, 0)
-	var qm = make(map[string]*transfer.Quantity)
+	qm := make(map[string]*transfer.Quantity)
 	for _, q := range qs {
 		if strings.Contains(q.Name, "polling_") {
 			row := createQuantityRow(q)
@@ -201,4 +201,18 @@ func echoLocalData(planName string, view *ViewOpt) {
 	printErrorMessage(planName+":H", quantities.Handler, view)
 	printErrorMessage(planName+":E", quantities.Event, view)
 	quantities = newQuantities()
+}
+
+func hasLocalError() bool {
+	for _, quantity := range quantities.Handler {
+		if len(quantity.ErrorMap) > 0 {
+			return true
+		}
+	}
+	for _, quantity := range quantities.Event {
+		if len(quantity.ErrorMap) > 0 {
+			return true
+		}
+	}
+	return false
 }

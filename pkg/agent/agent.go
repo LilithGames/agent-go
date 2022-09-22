@@ -26,7 +26,7 @@ type Agent struct {
 	ctx      context.Context
 	cancel   context.CancelFunc
 	engine   *Engine
-	cfg      *viper.Viper
+	variable *variable
 	endpoint string
 	view     *ViewOpt
 	alert    Alert
@@ -48,15 +48,16 @@ func NewAgent(engine *Engine, cfg *viper.Viper, opts ...Option) *Agent {
 			}
 		}
 	}
-	id := cfg.GetString("ID")
-	endpoint := cfg.GetString(masterAddr)
+	variable := initVariable(cfg)
+	id := variable.GetString("ID")
+	endpoint := variable.GetString(masterAddr)
 	ctx, cancel := context.WithCancel(context.Background())
 	at := &Agent{
 		id:       id,
 		ctx:      ctx,
 		cancel:   cancel,
 		engine:   engine,
-		cfg:      cfg,
+		variable: variable,
 		endpoint: endpoint,
 	}
 	for _, opt := range opts {
@@ -74,6 +75,10 @@ func (a *Agent) Start() {
 	}
 }
 
+func (a *Agent) CheckResult() error {
+	return a.stream.checkResult()
+}
+
 func (a *Agent) startDefaultAgent() {
 	a.stream = newProxyFromAgent(a)
 	newManagerFromAgent(a).startLocalService()
@@ -82,7 +87,7 @@ func (a *Agent) startDefaultAgent() {
 func (a *Agent) startClusterAgent() {
 	conn := a.dialMaster()
 	defer conn.Close()
-	var ctx = a.newOutgoingContext()
+	ctx := a.newOutgoingContext()
 	client, err := transfer.NewCourierClient(conn).DeliverMail(ctx)
 	if err != nil {
 		log.Panic("request grpc courier error", zap.Error(err))
