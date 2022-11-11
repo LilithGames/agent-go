@@ -211,3 +211,15 @@ func NewGqlSubscriber(name string, query interface{}) *GqlSubscriber {
 	}
 	return subscriber
 }
+
+func NewGqlRawSubscriber(name, query string) *GqlSubscriber {
+	subscriber := &GqlSubscriber{}
+	subscriber.SubTopic = func(ticker core.Ticker, client interface{}) error {
+		tick := ticker.(*Tick)
+		subClient := client.(*graphql.SubscriptionClient)
+		wrapHandler := subscriber.GqlSubscriberWrapHandler(name, tick)
+		_, err := subClient.SubscribeRaw(query, subscriber.variables, wrapHandler)
+		return err
+	}
+	return subscriber
+}
