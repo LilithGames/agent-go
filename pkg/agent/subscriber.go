@@ -137,11 +137,17 @@ func (g *GqlSubscriber) GqlSubscriberWrapHandler(name string, tick Ticker) Messa
 			log.Error("receive event data error", zap.Error(err))
 			return err
 		}
+		if message == nil {
+			return fmt.Errorf("receive raw message nil")
+		}
 		var rawMsg Message
 		err = json.Unmarshal(*message, &rawMsg)
 		if err != nil {
 			log.Error("unmarshal message error", zap.Error(err))
 			return err
+		}
+		if rawMsg.Data == nil {
+			return fmt.Errorf("receive raw message.data nil: %s", string(*message))
 		}
 		if g.reply != nil {
 			err = json.Unmarshal(*rawMsg.Data, g.reply)
