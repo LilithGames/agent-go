@@ -1,8 +1,10 @@
 package agent
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -185,7 +187,7 @@ func (g *GqlSubscriber) recoverPanic(name string, tick Ticker) {
 		outcome.Name = name
 		outcome.Class = transfer.CLASS_EVENT
 		outcome.Status = transfer.STATUS_ERROR
-		outcome.Err = fmt.Sprintf("receive panic: %v", r)
+		outcome.Err = fmt.Sprintf("receive panic: %v \n", PanicMessage(r))
 		tick.actorCtx().Send(tick.stat(), &outcome)
 		log.Error("event panic", zap.String("event", name), zap.String("task", tick.GetTree().GetTitile()), zap.Error(fmt.Errorf("panic: %v", r)))
 	}
@@ -228,4 +230,17 @@ func NewGqlRawSubscriber(name, query string) *GqlSubscriber {
 		return err
 	}
 	return subscriber
+}
+
+func PanicMessage(err interface{}) string {
+	buf := new(bytes.Buffer)
+	fmt.Fprintf(buf, "%v\n", err)
+	for i := 1;; i ++ {
+		_, file, line, ok := runtime.Caller(i)
+		if !ok {
+			break
+		}
+		fmt.Fprintf(buf, "%s:%d\n", file, line)
+	}
+	return buf.String()
 }
